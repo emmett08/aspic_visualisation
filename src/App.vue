@@ -1,23 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import ArgumentGraph from "./components/ArgumentGraph.vue";
-import {
-  buildGraph,
-  compareSnapshots,
-  parseAspicView,
-  MAX_FILE_BYTES,
-} from "./domain/aspic";
-import type { AspicView } from "./domain/aspic";
+import ArgumentInspector from "./components/ArgumentInspector.vue";
+import SnapshotEvents from "./components/SnapshotEvents.vue";
+import type { SnapshotEvent } from "./components/SnapshotEvents.vue";
+import { buildGraph, parseAspicView, MAX_FILE_BYTES } from "./domain/aspic";
 import sampleData from "./domain/sample.json";
 import { sampleView } from "./domain/sample";
 
-interface SnapshotEvent {
-  id: number;
-  title: string;
-  time: string;
-  view: AspicView;
-  kind: "sample" | "import";
-}
 const sample = sampleView;
 const events = ref<SnapshotEvent[]>([
   {
@@ -56,18 +46,6 @@ const importing = ref(false);
 const announcement = ref("Engineering example loaded.");
 const sourcePanel = ref(false);
 const graphData = computed(() => buildGraph(view.value));
-const argument = computed(() =>
-  view.value.arguments.find((a) => a.id === selectedArgument.value),
-);
-const edge = computed(
-  () =>
-    graphData.value.edges.find((e) => e.data.id === selectedEdge.value)?.data,
-);
-const defeat = computed(() =>
-  edge.value?.defeatIndex !== undefined
-    ? view.value.defeats[edge.value.defeatIndex]
-    : undefined,
-);
 const counts = computed(() => ({
   in: view.value.arguments.filter((a) => a.label === "in").length,
   out: view.value.arguments.filter((a) => a.label === "out").length,
@@ -87,18 +65,6 @@ const filteredRelations = computed(() =>
       .includes(query.value.toLowerCase()),
   ),
 );
-const adjacentRelations = computed(() =>
-  graphData.value.edges.filter(
-    (e) =>
-      e.data.source === `argument:${selectedArgument.value}` ||
-      e.data.target === `argument:${selectedArgument.value}`,
-  ),
-);
-const changes = computed(() =>
-  currentIndex.value > 0
-    ? compareSnapshots(events.value[currentIndex.value - 1]!.view, view.value)
-    : null,
-);
 const sourceSummary = computed(() => [
   ["Profile", view.value.profile],
   ["Goal atom", view.value.goal],
@@ -112,27 +78,9 @@ const sourceSummary = computed(() => [
 function shortId(id: string) {
   return id.replace(/^argument:/, "");
 }
-function pretty(value: unknown) {
-  return typeof value === "string" ? value : JSON.stringify(value, null, 2);
-}
-function field(value: unknown, name: string): unknown {
-  return value !== null && typeof value === "object"
-    ? (value as Record<string, unknown>)[name]
-    : undefined;
-}
-function textField(value: unknown, name: string): string {
-  const result = field(value, name);
-  return result === undefined || result === null ? "" : pretty(result);
-}
 function nodeName(id: string) {
   const a = view.value.arguments.find((a) => a.id === shortId(id));
   return a ? `${a.id} · ${a.display_conclusion}` : shortId(id);
-}
-function previousNodeName(id: string) {
-  const previous = events.value[currentIndex.value - 1]?.view.arguments.find(
-    (a) => a.id === id,
-  );
-  return previous ? `${previous.id} · ${previous.display_conclusion}` : id;
 }
 function selectArgument(id: string) {
   selectedArgument.value = id;
@@ -501,343 +449,22 @@ function downloadSample() {
           </div>
         </section>
 
-        <aside class="details-panel" aria-label="Selection details">
-          <div class="panel-heading">
-            <h2>Inspect</h2>
-            <span class="eyebrow">{{ edge ? "Relation" : "Argument" }}</span>
-          </div>
-          <div class="details-content">
-            <template v-if="argument">
-              <div class="detail-id">
-                <span>{{ argument.id }}</span
-                ><span class="label-chip" :class="argument.label">{{
-                  argument.label
-                }}</span>
-              </div>
-              <h3>{{ argument.display_conclusion }}</h3>
-              <p v-if="argument.authored_statement" class="statement">
-                {{ argument.authored_statement }}
-              </p>
-              <p v-else class="statement muted">
-                {{
-                  textField(argument.origin, "meaning") ||
-                  "No authored claim statement supplied."
-                }}
-              </p>
-              <dl class="compact-dl">
-                <dt>Source kind</dt>
-                <dd>{{ argument.origin.kind }}</dd>
-                <dt>Source name</dt>
-                <dd>{{ argument.origin.name }}</dd>
-                <dt>Rule / premise</dt>
-                <dd>{{ argument.rule_id || argument.conclusion }}</dd>
-                <dt>Inference</dt>
-                <dd>{{ argument.top }}</dd>
-                <dt
-                  title="Minimum rank across the fallible elements in this derivation"
-                >
-                  Strength
-                </dt>
-                <dd>
-                  {{
-                    argument.strength === 1001
-                      ? "Strict / axiom only"
-                      : argument.strength
-                  }}
-                </dd>
-                <template v-if="argument.rank !== undefined"
-                  ><dt>Authored rank</dt>
-                  <dd>{{ argument.rank }}</dd></template
-                >
-              </dl>
-              <section
-                v-if="argument.direct_subarguments.length"
-                class="detail-section"
-              >
-                <h4>Direct subarguments</h4>
-                <div class="inline-buttons">
-                  <button
-                    v-for="id in argument.direct_subarguments"
-                    :key="id"
-                    @click="selectArgument(id)"
-                  >
-                    {{ id }} <span aria-hidden="true">↗</span>
-                  </button>
-                </div>
-              </section>
-              <section
-                v-if="
-                  textField(argument.origin, 'rationale') ||
-                  textField(argument.origin, 'reasoning')
-                "
-                class="detail-section"
-              >
-                <h4>Authored reasoning</h4>
-                <p class="metadata-text">
-                  {{
-                    textField(argument.origin, "rationale") ||
-                    textField(argument.origin, "reasoning")
-                  }}
-                </p>
-              </section>
-              <section
-                v-if="field(argument.origin, 'span')"
-                class="detail-section"
-              >
-                <h4>Source location</h4>
-                <pre>{{ pretty(field(argument.origin, "span")) }}</pre>
-              </section>
-              <section
-                v-if="field(argument.origin, 'formal_review')"
-                class="detail-section"
-              >
-                <h4>Reviewed annotations</h4>
-                <pre>{{ pretty(field(argument.origin, "formal_review")) }}</pre>
-                <p class="small-note">
-                  Authored references; review is not verified here.
-                </p>
-              </section>
-              <section
-                v-if="field(argument.origin, 'observation')"
-                class="detail-section"
-              >
-                <h4>Observation identity</h4>
-                <pre>{{ pretty(field(argument.origin, "observation")) }}</pre>
-              </section>
-              <section class="detail-section">
-                <h4>
-                  Connected relations
-                  <span>{{ adjacentRelations.length }}</span>
-                </h4>
-                <button
-                  v-for="item in adjacentRelations"
-                  :key="item.data.id"
-                  class="detail-relation"
-                  @click="selectEdge(item.data.id)"
-                >
-                  <span class="relation-kind" :class="item.data.kind">{{
-                    item.data.kind
-                  }}</span
-                  ><span
-                    >{{ shortId(item.data.source) }} →
-                    {{ shortId(item.data.target) }}</span
-                  ><span aria-hidden="true">↗</span>
-                </button>
-                <p v-if="!adjacentRelations.length" class="small-note">
-                  No connected relations.
-                </p>
-              </section>
-              <details class="raw-details">
-                <summary>Supplied argument record</summary>
-                <pre>{{ pretty(argument) }}</pre>
-              </details>
-            </template>
-            <template v-else-if="edge">
-              <span class="relation-kind" :class="edge.kind">{{
-                edge.kind
-              }}</span>
-              <h3 class="edge-title">
-                {{ shortId(edge.source) }} <span aria-hidden="true">→</span>
-                {{ shortId(edge.target) }}
-              </h3>
-              <p class="statement">
-                {{
-                  edge.kind === "support"
-                    ? "A direct subargument contributes to this derivation."
-                    : "A formal defeat targets this argument through the stated subargument."
-                }}
-              </p>
-              <section class="detail-section">
-                <h4>
-                  {{
-                    edge.kind === "support" ? "Direct subargument" : "Attacker"
-                  }}
-                </h4>
-                <button
-                  class="text-button wrap-button"
-                  @click="selectArgument(shortId(edge.source))"
-                >
-                  {{ nodeName(edge.source) }} ↗
-                </button>
-              </section>
-              <section class="detail-section">
-                <h4>
-                  {{
-                    edge.kind === "support"
-                      ? "Derived argument"
-                      : "Defeated argument"
-                  }}
-                </h4>
-                <button
-                  class="text-button wrap-button"
-                  @click="selectArgument(shortId(edge.target))"
-                >
-                  {{ nodeName(edge.target) }} ↗
-                </button>
-              </section>
-              <section v-if="defeat" class="witness-box">
-                <h4>Exact attacked subargument</h4>
-                <button
-                  class="text-button wrap-button"
-                  @click="selectArgument(defeat.subargument)"
-                >
-                  {{ nodeName(defeat.subargument) }} ↗
-                </button>
-                <p v-if="defeat.kind === 'undercut'">
-                  The attack challenges this subargument’s defeasible rule.
-                </p>
-                <p v-else-if="defeat.kind === 'undermine'">
-                  The attack challenges this subargument’s ordinary premise.
-                </p>
-                <p v-else>
-                  The attack challenges this subargument’s conclusion.
-                </p>
-              </section>
-              <section
-                v-if="defeat && field(defeat, 'relation_origin')"
-                class="detail-section"
-              >
-                <h4>Authored relation</h4>
-                <pre>{{ pretty(field(defeat, "relation_origin")) }}</pre>
-              </section>
-              <p v-if="defeat" class="small-note">
-                Several defeat edges may share endpoints while identifying
-                different attacked subarguments.
-              </p>
-            </template>
-            <p v-else class="empty-message">
-              Select an argument or relation in the graph or navigation list.
-            </p>
-            <section
-              v-if="view.unavailable_evidence.length"
-              class="unavailable-section"
-            >
-              <h4>
-                Unavailable evidence
-                <span>{{ view.unavailable_evidence.length }}</span>
-              </h4>
-              <p>
-                These declarations did not supply a premise. Absence is not
-                falsity.
-              </p>
-              <details
-                v-for="(item, index) in view.unavailable_evidence"
-                :key="index"
-              >
-                <summary>
-                  {{ textField(item, "name") || `Evidence ${index + 1}` }}
-                </summary>
-                <pre>{{ pretty(item) }}</pre>
-              </details>
-            </section>
-          </div>
-          <div class="provenance-note">
-            <svg class="info-icon" viewBox="0 0 16 16" aria-hidden="true">
-              <circle cx="8" cy="8" r="6" />
-              <path d="M8 7v4m0-6v.5" />
-            </svg>
-            Source provenance is supplied, not authenticated.
-          </div>
-        </aside>
+        <ArgumentInspector
+          :view="view"
+          :graph-data="graphData"
+          :selected-argument="selectedArgument"
+          :selected-edge="selectedEdge"
+          @select-argument="selectArgument"
+          @select-edge="selectEdge"
+        />
       </div>
 
-      <section class="events-panel" aria-label="Snapshot events">
-        <div class="events-heading">
-          <div>
-            <h2>
-              Snapshot events <span>{{ events.length }}</span>
-            </h2>
-            <p>Session imports · select an event to restore its graph</p>
-          </div>
-          <span class="session-note">In memory only · last 20 snapshots</span>
-        </div>
-        <div class="event-track">
-          <button
-            v-for="(event, index) in events"
-            :key="event.id"
-            class="event-card"
-            :class="{ active: event.id === activeEvent }"
-            :aria-pressed="event.id === activeEvent"
-            @click="restoreEvent(event.id)"
-          >
-            <span class="event-marker" aria-hidden="true">{{ index + 1 }}</span
-            ><span class="event-copy"
-              ><strong>{{ event.title }}</strong
-              ><span
-                >{{
-                  event.kind === "sample"
-                    ? "Sample loaded"
-                    : "Snapshot imported"
-                }}
-                · {{ event.time }}</span
-              ></span
-            ><span v-if="event.id === activeEvent" class="active-event-label"
-              >Viewing</span
-            >
-          </button>
-        </div>
-        <div class="event-diff">
-          <template v-if="changes"
-            ><strong>Argument structure and labels:</strong
-            ><span class="diff-added"
-              >+{{ changes.added.length }} arguments</span
-            ><span class="diff-removed"
-              >−{{ changes.removed.length }} arguments</span
-            ><span>{{ changes.labelChanged.length }} label changes</span
-            ><span v-if="changes.warnings.length" class="diff-warning">{{
-              changes.warnings.join(" ")
-            }}</span></template
-          ><template v-else
-            ><span class="event-dot" aria-hidden="true"></span>Initial snapshot.
-            Import another export to compare argument identities and
-            labels.</template
-          >
-        </div>
-        <details
-          v-if="
-            changes &&
-            (changes.added.length ||
-              changes.removed.length ||
-              changes.labelChanged.length)
-          "
-          class="change-list"
-        >
-          <summary>Inspect argument structure and label changes</summary>
-          <ul>
-            <li v-for="id in changes.added" :key="'added:' + id">
-              <span class="change-kind diff-added">Added</span
-              ><button class="text-button" @click="selectArgument(id)">
-                {{ nodeName(id) }} ↗
-              </button>
-            </li>
-            <li
-              v-for="item in changes.labelChanged"
-              :key="'changed:' + item.currentId"
-            >
-              <span class="change-kind">Label changed</span
-              ><button
-                class="text-button"
-                @click="selectArgument(item.currentId)"
-              >
-                {{ nodeName(item.currentId) }} ↗</button
-              ><span
-                ><span class="label-chip" :class="item.previousLabel">{{
-                  item.previousLabel
-                }}</span>
-                →
-                <span class="label-chip" :class="item.currentLabel">{{
-                  item.currentLabel
-                }}</span></span
-              >
-            </li>
-            <li v-for="id in changes.removed" :key="'removed:' + id">
-              <span class="change-kind diff-removed">Removed</span
-              ><span>{{ previousNodeName(id) }}</span
-              ><span class="small-note">previous snapshot</span>
-            </li>
-          </ul>
-        </details>
-      </section>
+      <SnapshotEvents
+        :events="events"
+        :active-event="activeEvent"
+        @restore="restoreEvent"
+        @select-argument="selectArgument"
+      />
       <footer class="app-footer">
         <span
           >ASPIC+ VIEW / 1 <span aria-hidden="true">·</span> All files stay in
