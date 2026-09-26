@@ -1,0 +1,405 @@
+{
+  "schema": "aspic-view/1",
+  "theory_digest": "2bd2a124b9e4c3bf8319862706969b2d5ebe47bd5d6e75d50758577f2024271e",
+  "evaluated_at": "2026-09-25T10:00:30Z",
+  "validation": {
+    "formal_result": "recomputed",
+    "provenance": "supplied"
+  },
+  "profile": "EAL/2-compiled-aspic/4",
+  "goal": "c7d0843fae823cf542bd6",
+  "goal_claim": "run_passes",
+  "formal_status": "accepted",
+  "claim_status": "supported",
+  "authored_claim_status": "supported",
+  "source_digest": "2ec7a3fcab449de528e7e43ee1923bbbf46d0bcb2f4bd66b6d65b427da24768c",
+  "snapshot_digest": "fb4ca7e84ffc7139dba214dc32868c626a62895b8bfec39515d4a84bb7e53379",
+  "arguments": [
+    {
+      "conclusion": "ef041a8271909948b0680",
+      "direct_subarguments": [],
+      "id": "A0",
+      "label": "in",
+      "rank": 500,
+      "strength": 500,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "checked_record",
+        "span": {
+          "line": 9,
+          "column": 1,
+          "end_line": 12,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "37d261f7-edd2-4d0b-9553-8eeaccf1e17e",
+          "data_digest": "22d5961de159f5aa84b2ca796d00460e0d516f6c3756278323b5cdc3678933cd",
+          "request_digest": "0238e7ded4d0c030106e8509272687e1af60188a46ec27dc7886ac202617c8af",
+          "collected_at": "2026-09-25T10:00:00Z",
+          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+        }
+      },
+      "display_conclusion": "checked_record"
+    },
+    {
+      "conclusion": "e1a77da4ea20fb919150f",
+      "direct_subarguments": [],
+      "id": "A1",
+      "label": "in",
+      "rank": 500,
+      "strength": 500,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "gap_record",
+        "span": {
+          "line": 17,
+          "column": 1,
+          "end_line": 20,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "9cddd29e-bcca-486e-9fab-6c6aa292fd6f",
+          "data_digest": "08211cdf62af82b8652d35acab2a6a7b17f003694613e7b61a9f9e3d6e1b73ed",
+          "request_digest": "e08ba75764af5d98cc3b96d5c92c66fc6d8c6921ec55472dd1a1d243961a4187",
+          "collected_at": "2026-09-25T10:00:00Z",
+          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+        }
+      },
+      "display_conclusion": "gap_record"
+    },
+    {
+      "conclusion": "e84f591a7c8f59e61fc00",
+      "direct_subarguments": [],
+      "id": "A2",
+      "label": "in",
+      "rank": 500,
+      "strength": 500,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "latency_record",
+        "span": {
+          "line": 13,
+          "column": 1,
+          "end_line": 16,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "4360328c-682d-4392-8b75-c7c08f0ebcad",
+          "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
+          "request_digest": "3236a96d7a4f74c6c652524ec619cf50ef1a16b077c302c9ec4c0138fea449df",
+          "collected_at": "2026-09-25T10:00:00Z",
+          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+        }
+      },
+      "display_conclusion": "latency_record"
+    },
+    {
+      "conclusion": "e265b4e725bb5b48eb373",
+      "direct_subarguments": [],
+      "id": "A3",
+      "label": "in",
+      "rank": 700,
+      "strength": 700,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "probe_record",
+        "span": {
+          "line": 21,
+          "column": 1,
+          "end_line": 24,
+          "end_column": 2
+        },
+        "formal_review": {
+          "kind": "rank",
+          "name": "probe_record",
+          "other": null,
+          "rank": 700,
+          "review": "synthetic-review/probe-observation",
+          "span": {
+            "line": 57,
+            "column": 1,
+            "end_line": 57,
+            "end_column": 69
+          },
+          "target_kind": "evidence"
+        },
+        "observation": {
+          "run_id": "a3392755-93dd-412b-84a7-9c5c3a86fb35",
+          "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
+          "request_digest": "f7a46d318c7a7d49fc04bd8508d5c9fda84d44cd89c42e0a7cb4ebaba188fc8f",
+          "collected_at": "2026-09-25T10:00:00Z",
+          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+        }
+      },
+      "display_conclusion": "probe_record"
+    },
+    {
+      "conclusion": "cd3d5f3aa6979d8d6face",
+      "direct_subarguments": [
+        "A1"
+      ],
+      "id": "A4",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "r047bc8b44475207bcd43",
+      "rule_name": "x07287c9e93180f2926ec",
+      "strength": 500,
+      "subarguments": [
+        "A1"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "gap_arg",
+        "span": {
+          "line": 46,
+          "column": 1,
+          "end_line": 46,
+          "end_column": 84
+        },
+        "formal_review": null,
+        "rationale": "The stipulated finding concerns only the identified synthetic run.",
+        "reasoning": "recorded"
+      },
+      "display_conclusion": "trace_gap",
+      "authored_statement": "The synthetic diagnostic reports a primary trace gap."
+    },
+    {
+      "conclusion": "c877fa7caa72adb7e4684",
+      "direct_subarguments": [
+        "A3"
+      ],
+      "id": "A5",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "r49514b5d6f460956713d",
+      "rule_name": "xdf621521cf254d982452",
+      "strength": 500,
+      "subarguments": [
+        "A3"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "probe_arg",
+        "span": {
+          "line": 47,
+          "column": 1,
+          "end_line": 47,
+          "end_column": 97
+        },
+        "formal_review": null,
+        "rationale": "The stipulated finding concerns only the identified synthetic run.",
+        "reasoning": "recorded"
+      },
+      "display_conclusion": "alternate_probe_ok",
+      "authored_statement": "An independent synthetic probe for this run meets its latency limit."
+    },
+    {
+      "conclusion": "c0592dc0551273c1ddf58",
+      "direct_subarguments": [
+        "A2"
+      ],
+      "id": "A6",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "r89a15083b7a2bca8bcb1",
+      "rule_name": "x812f45b6a7bbc97dc37b",
+      "strength": 500,
+      "subarguments": [
+        "A2"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "latency_arg",
+        "span": {
+          "line": 45,
+          "column": 1,
+          "end_line": 45,
+          "end_column": 93
+        },
+        "formal_review": null,
+        "rationale": "The stipulated finding concerns only the identified synthetic run.",
+        "reasoning": "recorded"
+      },
+      "display_conclusion": "latency_ok",
+      "authored_statement": "The synthetic primary latency sample meets its limit."
+    },
+    {
+      "conclusion": "c3210d2e10fe478a64478",
+      "direct_subarguments": [
+        "A0"
+      ],
+      "id": "A7",
+      "label": "in",
+      "rule_id": "rdfb7eecf4d2fc3407d4e",
+      "strength": 500,
+      "subarguments": [
+        "A0"
+      ],
+      "top": "strict",
+      "origin": {
+        "kind": "argument",
+        "name": "report_arg",
+        "span": {
+          "line": 44,
+          "column": 1,
+          "end_line": 44,
+          "end_column": 96
+        },
+        "formal_review": {
+          "kind": "strict",
+          "name": "report_arg",
+          "other": null,
+          "rank": null,
+          "review": "synthetic-review/checked-record-implication",
+          "span": {
+            "line": 55,
+            "column": 1,
+            "end_line": 55,
+            "end_column": 74
+          },
+          "target_kind": "argument"
+        },
+        "rationale": "The stipulated finding concerns only the identified synthetic run.",
+        "reasoning": "recorded"
+      },
+      "display_conclusion": "report_checked",
+      "authored_statement": "The synthetic report identity was checked."
+    },
+    {
+      "conclusion": "c7d0843fae823cf542bd6",
+      "direct_subarguments": [
+        "A5"
+      ],
+      "id": "A8",
+      "label": "in",
+      "rank": 700,
+      "rule_id": "r7a3964788b846b6c0ef7",
+      "rule_name": "xb70048525b423e6fc266",
+      "strength": 500,
+      "subarguments": [
+        "A3",
+        "A5"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "independent_probe",
+        "span": {
+          "line": 51,
+          "column": 1,
+          "end_line": 53,
+          "end_column": 2
+        },
+        "formal_review": {
+          "kind": "rank",
+          "name": "independent_probe",
+          "other": null,
+          "rank": 700,
+          "review": "synthetic-review/independent-probe",
+          "span": {
+            "line": 56,
+            "column": 1,
+            "end_line": 56,
+            "end_column": 74
+          },
+          "target_kind": "argument"
+        },
+        "rationale": "The stipulated finding concerns only the identified synthetic run.",
+        "reasoning": "recorded"
+      },
+      "display_conclusion": "run_passes",
+      "authored_statement": "The synthetic run meets the stated criterion through an accepted route."
+    },
+    {
+      "conclusion": "c7d0843fae823cf542bd6",
+      "direct_subarguments": [
+        "A7",
+        "A6"
+      ],
+      "id": "A9",
+      "label": "out",
+      "rank": 500,
+      "rule_id": "r97f126cc790f1f162aee",
+      "rule_name": "x8b22942d0aab813de134",
+      "strength": 500,
+      "subarguments": [
+        "A0",
+        "A7",
+        "A2",
+        "A6"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "primary_run",
+        "span": {
+          "line": 48,
+          "column": 1,
+          "end_line": 50,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "rationale": "The stipulated finding concerns only the identified synthetic run.",
+        "reasoning": "recorded"
+      },
+      "display_conclusion": "run_passes",
+      "authored_statement": "The synthetic run meets the stated criterion through an accepted route."
+    },
+    {
+      "conclusion": "ode5457bf52e544bf6f05",
+      "direct_subarguments": [
+        "A4"
+      ],
+      "id": "A10",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "jde5457bf52e544bf6f05",
+      "rule_name": "xd8526e8ff18fdae8f2a2",
+      "strength": 500,
+      "subarguments": [
+        "A1",
+        "A4"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "objection",
+        "name": "primary_trace_gap",
+        "span": {
+          "line": 54,
+          "column": 1,
+          "end_line": 54,
+          "end_column": 81
+        },
+        "formal_review": null
+      },
+      "display_conclusion": "primary_trace_gap"
+    }
+  ],
+  "defeats": [
+    {
+      "attacker": "A10",
+      "kind": "undercut",
+      "subargument": "A9",
+      "target": "A9",
+      "relation_origin": {
+        "objection": "primary_trace_gap",
+        "annotation": null
+      }
+    }
+  ],
+  "unavailable_evidence": []
+}
