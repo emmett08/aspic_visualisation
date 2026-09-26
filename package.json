@@ -1,0 +1,31 @@
+{
+  "name": "aspic-visualisation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "vue-tsc --noEmit",
+    "test:browser": "playwright test"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "cytoscape": "3.34.3",
+    "vue": "3.5.43"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "@types/node": "24.10.0",
+    "@vitejs/plugin-vue": "6.0.9",
+    "typescript": "5.9.3",
+    "vite": "8.3.1",
+    "vitest": "4.1.2",
+    "vue-tsc": "3.2.6"
+  }
+}
