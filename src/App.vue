@@ -3,12 +3,15 @@ import { computed, ref } from "vue";
 import ArgumentGraph from "./components/ArgumentGraph.vue";
 import ArgumentInspector from "./components/ArgumentInspector.vue";
 import SnapshotEvents from "./components/SnapshotEvents.vue";
+import TheoryEditor from "./components/TheoryEditor.vue";
 import type { SnapshotEvent } from "./components/SnapshotEvents.vue";
+import type { AspicView } from "./domain/aspic";
 import { buildGraph, parseAspicView, MAX_FILE_BYTES } from "./domain/aspic";
 import sampleData from "./domain/sample.json";
 import { sampleView } from "./domain/sample";
 
 const sample = sampleView;
+const solverEnabled = import.meta.env.DEV && __ASPIC_SOLVER_ENABLED__;
 const events = ref<SnapshotEvent[]>([
   {
     id: 1,
@@ -104,6 +107,15 @@ function restoreEvent(id: number) {
     view.value.arguments[0]?.id ??
     null;
   announcement.value = `${current.value.title} restored.`;
+}
+function addSolvedTheory({ view: solved, title }: { view: AspicView; title: string }) {
+  const nextId = (events.value.at(-1)?.id ?? 0) + 1;
+  events.value.push({ id: nextId, title, time: new Date().toLocaleTimeString([], {
+    hour: "2-digit", minute: "2-digit",
+  }), view: solved, kind: "evaluation" });
+  if (events.value.length > 20) events.value.shift();
+  restoreEvent(nextId);
+  announcement.value = `${title} evaluated. ${solved.arguments.length} arguments.`;
 }
 async function importFile(event: Event) {
   const input = event.target as HTMLInputElement;
@@ -204,6 +216,7 @@ function downloadSample() {
     </header>
 
     <main>
+      <TheoryEditor :enabled="solverEnabled" @solved="addSolvedTheory" />
       <div v-if="importError" class="error-banner" role="alert">
         <strong>Snapshot not imported.</strong> {{ importError }}
         <button aria-label="Dismiss import error" @click="importError = ''">
@@ -251,9 +264,9 @@ function downloadSample() {
           >
         </dl>
         <p>
-          Labels are imported results. Provenance and review references are
-          supplied metadata; this viewer does not authenticate them or run the
-          solver.
+          Provenance and review references are supplied metadata; this viewer
+          does not authenticate them. The optional theory editor delegates
+          evaluation to EAL; imported files are checked locally in the browser.
         </p>
       </section>
 
@@ -444,7 +457,7 @@ function downloadSample() {
               >Undecided</span
             ><span><i class="legend-node goal" aria-hidden="true"></i>Goal</span
             ><span class="legend-note"
-              >Labels are relative to the imported theory.</span
+              >Labels are relative to the assessed theory.</span
             >
           </div>
         </section>
@@ -467,10 +480,10 @@ function downloadSample() {
       />
       <footer class="app-footer">
         <span
-          >ASPIC+ VIEW / 1 <span aria-hidden="true">·</span> All files stay in
-          this browser.</span
+          >ASPIC+ VIEW / 1 <span aria-hidden="true">·</span> Imported files stay in
+          this browser. <template v-if="solverEnabled">Edited theories use the local EAL solver.</template></span
         ><span
-          >Snapshot events record imports, not the order in which reasoning
+          >Snapshot events record imports and evaluations, not the order in which reasoning
           occurred.</span
         >
       </footer>

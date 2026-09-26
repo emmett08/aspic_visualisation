@@ -6,7 +6,7 @@ export interface SnapshotEvent {
   title: string;
   time: string;
   view: AspicView;
-  kind: "sample" | "import";
+  kind: "sample" | "import" | "evaluation";
 }
 </script>
 
@@ -57,7 +57,7 @@ function selectArgument(id: string) {
         <h2>
           Snapshot events <span>{{ events.length }}</span>
         </h2>
-        <p>Session imports · select an event to restore its graph</p>
+        <p>Session snapshots · select an event to restore its graph</p>
       </div>
       <span class="session-note">In memory only · last 20 snapshots</span>
     </div>
@@ -75,7 +75,7 @@ function selectArgument(id: string) {
           ><strong>{{ event.title }}</strong
           ><span
             >{{
-              event.kind === "sample" ? "Sample loaded" : "Snapshot imported"
+              event.kind === "sample" ? "Sample loaded" : event.kind === "evaluation" ? "Theory evaluated" : "Snapshot imported"
             }}
             · {{ event.time }}</span
           ></span
@@ -96,7 +96,7 @@ function selectArgument(id: string) {
         }}</span></template
       ><template v-else
         ><span class="event-dot" aria-hidden="true"></span>Initial snapshot.
-        Import another export to compare argument identities and
+        Import an export or build a theory to compare argument identities and
         labels.</template
       >
     </div>

@@ -11,7 +11,9 @@
 | Vue components | Local file import, selection, source inspection, filters and session history |
 | Cytoscape.js | Render a single graph, pan/zoom, selection events and image export |
 
-This keeps solver semantics and observation acquisition in Python. The web app has no Python service dependency, cross-origin API or second ASPIC+ implementation. Its small grounded-label check validates the supplied graph; it cannot verify completeness of the graph against the omitted formal theory.
+This keeps solver semantics and observation acquisition in Python. The default static app has no Python service dependency, cross-origin API or second ASPIC+ implementation. Its small grounded-label check validates the supplied graph; it cannot verify completeness of the graph against the omitted formal theory.
+
+An optional development-only theory editor translates explicit text fields into the existing EAL JSON theory contract. `server/solver-plugin.ts` passes a bounded JSON request to `server/solve.py`; that bridge calls the pinned EAL solver and checked exporter. No solver algorithm is copied into TypeScript. This deliberately adds no collector execution, source-language parsing, implicit contraries or preference-policy inference. A successful evaluation enters the same validated view and session history as an imported export. The static production build keeps graph inspection and disables evaluation.
 
 The boundary is a versioned, bounded data contract. Ajv validates the committed producer JSON Schema, avoiding a second handwritten field schema. Graph invariants, defeat propagation and grounded labelling are checked independently. An independent application can consume it without importing EAL's evaluator. The Python package contains no embedded frontend script or style string. The app contains no collector configuration or executable EAL source evaluation.
 
@@ -23,7 +25,7 @@ Layout is presentation only. Labels and relationships come from the imported ass
 
 ## Events and comparison
 
-An event records importing or selecting a session snapshot. It is not an engineering event or timestamped observation. The assessment time and source/snapshot digests are displayed separately.
+An event records importing or evaluating a session snapshot. It is not an engineering event or timestamped observation. The assessment time and source/snapshot digests are displayed separately.
 
 Snapshot comparison identifies a derivation through its semantic origin, rule or premise and immediate subderivations. Solver-local IDs such as `A7` cannot identify the same argument across different compilations. An inserted unrelated premise can renumber all later arguments without changing their meaning. Comparison tests cover this case and shared diamond derivations.
 

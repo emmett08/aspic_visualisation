@@ -3,6 +3,16 @@ import { readFileSync } from 'node:fs'
 import type { AspicView } from '../src/domain/aspic'
 const sample: AspicView = JSON.parse(readFileSync(new URL('../src/domain/sample.json', import.meta.url), 'utf8'))
 
+test('static build can populate theory fields while evaluation stays disabled', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Load engineering demo' }).click()
+  await expect(page.getByLabel('Axioms', { exact: true })).toHaveValue('voltage_ok')
+  await expect(page.getByLabel('Contraries', { exact: true })).toHaveValue('unreliable_test -> applicable_d1')
+  await expect(page.getByLabel('Goal', { exact: true })).toHaveValue('pump_ready')
+  await expect(page.getByRole('button', { name: 'Build graph', exact: true })).toBeDisabled()
+  await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+})
+
 async function importView(page: import('@playwright/test').Page, view: unknown, name: string) {
   await page.getByLabel('Import an ASPIC view JSON snapshot').setInputFiles({
     name, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(view)),

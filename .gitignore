@@ -4,3 +4,7 @@ playwright-report/
 test-results/
 *.log
 .DS_Store
+.runtime/
+.venv/
+.env.local
+__pycache__/
