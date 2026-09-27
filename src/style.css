@@ -908,6 +908,25 @@ main {
 .unavailable-section details {
   margin: 10px 0;
 }
+.evidence-group {
+  border-left: 2px solid #dce6de;
+  padding-left: 10px;
+  margin: 15px 0;
+}
+.evidence-group h5 {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 650;
+}
+.evidence-group h5 span {
+  float: right;
+  font-weight: 400;
+}
+.evidence-group p {
+  color: #68786d;
+  font-size: 10px;
+  line-height: 1.6;
+}
 .events-panel {
   margin-top: 18px;
   border: 1px solid #dfe5df;

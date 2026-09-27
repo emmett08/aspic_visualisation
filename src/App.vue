@@ -480,7 +480,7 @@ function downloadSample() {
       />
       <footer class="app-footer">
         <span
-          >ASPIC+ VIEW / 1 <span aria-hidden="true">·</span> Imported files stay in
+          >{{ view.schema }} <span aria-hidden="true">·</span> Imported files stay in
           this browser. <template v-if="solverEnabled">Edited theories use the local EAL solver.</template></span
         ><span
           >Snapshot events record imports and evaluations, not the order in which reasoning

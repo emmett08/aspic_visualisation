@@ -59,12 +59,12 @@ Or generate the maintained synthetic example from the EAL repository:
 python examples/api-load-test/aspic_compiled_demo.py --export-view /tmp/view.json
 ```
 
-Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The app consumes the versioned [`aspic-view/1` JSON contract](schema/aspic-view.schema.json), not EAL source text.
+Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The app consumes the versioned [`aspic-view/2` JSON contract](schema/aspic-view.schema.json) and can still inspect [historical `/1` exports](schema/aspic-view-v1.schema.json), not EAL source text.
 
 - Solid derivation edges connect an immediate subargument to the argument using it. Reused evidence remains one node.
 - Dashed defeat edges connect attacker to defeated argument. The inspector identifies the exact attacked subargument and whether the defeat undermines, rebuts or undercuts.
 - `in`, `out` and `undecided` are grounded labels, not truth values. A strict inference may still depend on fallible premises.
-- Source text, rationale, declaration location, observation metadata and review references remain inspectable. Missing observations appear separately and never become negative premises.
+- Source text, rationale, declaration location, observation metadata and review references remain inspectable. Declarations without premises are grouped by typed `/2` evaluation issue. A comparable observation that fails a predicate is distinct from a missing, expired, invalid or failed collection. `/1` exports supplied only free-form diagnostic text, so the app displays those declarations as unclassified legacy evidence. None of these absences becomes a negative premise.
 - Search and the argument list provide keyboard access to graph selection. Relation filters and neighbourhood focus make hidden graph content explicit.
 - Import successive snapshots to record session events and compare added, removed and relabelled derivations. Restoring an event restores its graph. Import order is not evidence chronology or a solver execution trace; differing source or assessment identities remain visible.
 
@@ -72,7 +72,7 @@ Import `view.json` in this app. Explicit formal theories can use the same EAL ex
 
 EAL recomputes the bounded formal theory and requires exact agreement with the supplied solver result before exporting. It checks supplied source-map structure but does not authenticate observations or establish correspondence between English statements and formal atoms.
 
-The browser validates the import contract, resource bounds, graph references, derivation closure and grounded labels against the imported defeat graph. It does **not** construct an ASPIC+ theory, check that every warranted defeat was exported, recollect evidence, or authenticate the exporter. An export's validation field is a supplied assertion, not a signature. Files are bounded to 4 MiB, 128 arguments and 4,096 defeat witnesses.
+The browser validates the import contract, resource bounds, graph references, derivation closure and grounded labels against the imported defeat graph. It does **not** construct an ASPIC+ theory, check that every warranted defeat was exported, recollect evidence, or authenticate the exporter. Typed availability issues are supplied by EAL; the browser checks their shape without verifying the source records. An export's validation field is a supplied assertion, not a signature. Files are bounded to 4 MiB, 128 arguments and 4,096 defeat witnesses.
 
 The default app inspects exports; the optional local editor delegates evaluation to the existing solver. Neither changes EAL's default evaluator. PyArg is an inspiration for interactive argument inspection; this app does not claim all of PyArg's theory editing, preference policies or extension semantics.
 

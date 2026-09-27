@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { buildGraph, compareSnapshots, groundedLabels, MAX_FILE_BYTES, MAX_ARGUMENTS, MAX_DEFEATS, parseAspicView, validateAspicView } from '../src/domain/aspic'
+import { buildGraph, compareSnapshots, evidenceGroups, groundedLabels, MAX_FILE_BYTES, MAX_ARGUMENTS, MAX_DEFEATS, parseAspicView, validateAspicView } from '../src/domain/aspic'
 import type { AspicArgument, AspicDefeat, AspicView, Label } from '../src/domain/aspic'
 import { sampleView } from '../src/domain/sample'
 import schema from '../schema/aspic-view.schema.json'
+import legacySchema from '../schema/aspic-view-v1.schema.json'
 
 const clone = <T>(x: T): T => structuredClone(x)
 function node(id: string, conclusion: string, children: string[] = []): AspicArgument {
@@ -17,7 +18,7 @@ function view(arguments_: AspicArgument[], defeats: AspicDefeat[] = [], goal = a
   const labels = groundedLabels(arguments_.map(a => a.id), defeats)
   arguments_.forEach(a => { a.subarguments = closure(a); a.label = labels.get(a.id)! })
   const goalLabels = arguments_.filter(a => a.conclusion === goal).map(a => a.label)
-  return { schema: 'aspic-view/1', profile: 'test-profile/1', goal, goal_claim: null,
+  return { schema: 'aspic-view/2', profile: 'test-profile/1', goal, goal_claim: null,
     formal_status: goalLabels.includes('in') ? 'accepted' : goalLabels.includes('undecided') ? 'undecided' : goalLabels.length ? 'rejected' : 'unconstructed',
     claim_status: null, authored_claim_status: null, source_digest: null, snapshot_digest: null,
     theory_digest: '0'.repeat(64), evaluated_at: null, validation: { formal_result: 'recomputed', provenance: 'supplied' },
@@ -41,7 +42,8 @@ function renumber(input: AspicView): AspicView {
 
 describe('versioned import boundary', () => {
   it('keeps runtime limits aligned with the checked-in producer schema', () => {
-    expect(schema.properties.schema.const).toBe('aspic-view/1')
+    expect(schema.properties.schema.const).toBe('aspic-view/2')
+    expect(legacySchema.properties.schema.const).toBe('aspic-view/1')
     expect(schema.properties.arguments.maxItems).toBe(MAX_ARGUMENTS)
     expect(schema.properties.defeats.maxItems).toBe(MAX_DEFEATS)
     expect(schema.additionalProperties).toBe(false)
@@ -52,6 +54,28 @@ describe('versioned import boundary', () => {
     expect(sampleView.defeats).toHaveLength(1)
     expect(sampleView.arguments.some(a => a.top === 'strict')).toBe(true)
     expect(sampleView.formal_status).toBe('accepted')
+  })
+  it('keeps typed unavailable outcomes distinct and old snapshots unclassified', () => {
+    const typed = clone(sampleView)
+    typed.unavailable_evidence = [
+      { name: 'negative_finding', reasons: ['Observed true'], span: null,
+        availability_issues: ['predicate_not_met'] },
+      { name: 'probe', reasons: ['No record'], span: null,
+        availability_issues: ['missing_observation', 'out_of_scope'] },
+    ]
+    expect(evidenceGroups(validateAspicView(typed)).map(g => g.issue)).toEqual([
+      'predicate_not_met', 'missing_observation', 'out_of_scope',
+    ])
+    const missingCode = clone(typed)
+    delete missingCode.unavailable_evidence[0]!.availability_issues
+    expect(() => validateAspicView(missingCode)).toThrow('required')
+    const invalidCode = clone(typed)
+    invalidCode.unavailable_evidence[0]!.availability_issues = ['guessed' as never]
+    expect(() => validateAspicView(invalidCode)).toThrow('allowed values')
+    const legacy = clone(typed)
+    legacy.schema = 'aspic-view/1'
+    legacy.unavailable_evidence.forEach(item => delete item.availability_issues)
+    expect(evidenceGroups(validateAspicView(legacy)).map(g => g.issue)).toEqual(['unclassified_legacy'])
   })
   it('rejects malformed JSON and legacy compiled-result envelopes', () => {
     expect(() => parseAspicView('{')).toThrow('invalid JSON')

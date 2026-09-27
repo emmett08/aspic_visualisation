@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import type { AspicView, AspicGraph } from "../domain/aspic";
+import { evidenceGroups, type AspicView, type AspicGraph } from "../domain/aspic";
 
 const props = defineProps<{
   view: AspicView;
@@ -31,6 +31,7 @@ const adjacentRelations = computed(() =>
       e.data.target === `argument:${props.selectedArgument}`,
   ),
 );
+const unavailableGroups = computed(() => evidenceGroups(props.view));
 function shortId(id: string) {
   return id.replace(/^argument:/, "");
 }
@@ -261,21 +262,21 @@ function selectEdge(id: string) {
         class="unavailable-section"
       >
         <h4>
-          Unavailable evidence
+          Evidence without premises
           <span>{{ view.unavailable_evidence.length }}</span>
         </h4>
         <p>
-          These declarations did not supply a premise. Absence is not falsity.
+          These declarations supplied no formal premise. The reason is shown
+          below; a missing record does not establish a false proposition.
         </p>
-        <details
-          v-for="(item, index) in view.unavailable_evidence"
-          :key="index"
-        >
-          <summary>
-            {{ textField(item, "name") || `Evidence ${index + 1}` }}
-          </summary>
-          <pre>{{ pretty(item) }}</pre>
-        </details>
+        <section v-for="group in unavailableGroups" :key="group.issue" class="evidence-group">
+          <h5>{{ group.title }} <span>{{ group.items.length }}</span></h5>
+          <p>{{ group.explanation }}</p>
+          <details v-for="(item, index) in group.items" :key="`${item.name}-${index}`">
+            <summary>{{ item.name }}</summary>
+            <pre>{{ pretty(item) }}</pre>
+          </details>
+        </section>
       </section>
     </div>
     <div class="provenance-note">

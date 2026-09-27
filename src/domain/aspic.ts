@@ -1,5 +1,6 @@
 import Ajv2020 from 'ajv/dist/2020.js'
 import schema from '../../schema/aspic-view.schema.json'
+import legacySchema from '../../schema/aspic-view-v1.schema.json'
 
 /** Read-only browser boundary for the versioned EAL ASPIC+ export.
  * Validation checks the supplied graph. It cannot authenticate provenance or prove
@@ -12,6 +13,16 @@ export type Label = 'in' | 'out' | 'undecided'
 export type FormalStatus = 'accepted' | 'rejected' | 'undecided' | 'unconstructed'
 export type ClaimStatus = 'supported' | 'contested' | 'unsupported' | 'out_of_scope'
 export type DefeatKind = 'undermine' | 'rebut' | 'undercut'
+export type AvailabilityIssue = 'predicate_not_met' | 'missing_observation' |
+  'stale_observation' | 'tool_error' | 'invalid_observation' | 'out_of_scope' |
+  'unclassified_legacy'
+export interface UnavailableEvidence {
+  name: string; reasons: string[]; span: SourceSpan | null;
+  availability_issues?: AvailabilityIssue[]
+}
+export interface EvidenceGroup {
+  issue: AvailabilityIssue; title: string; explanation: string; items: UnavailableEvidence[]
+}
 export interface SourceSpan { line: number; column: number; end_line: number; end_column: number }
 export interface ArgumentationDirective {
   kind: 'strict' | 'rank' | 'contrary'; name: string; other: string | null;
@@ -38,13 +49,13 @@ export interface AspicDefeat {
   relation_origin?: { objection: string | null; annotation: ArgumentationDirective | null }
 }
 export interface AspicView {
-  schema: 'aspic-view/1'; profile: string; goal: string; goal_claim: string | null;
+  schema: 'aspic-view/1' | 'aspic-view/2'; profile: string; goal: string; goal_claim: string | null;
   formal_status: FormalStatus; claim_status: ClaimStatus | null; authored_claim_status: ClaimStatus | null;
   source_digest: string | null; snapshot_digest: string | null; theory_digest: string;
   evaluated_at: string | null;
   validation: { formal_result: 'recomputed'; provenance: 'supplied' };
   arguments: AspicArgument[]; defeats: AspicDefeat[];
-  unavailable_evidence: { name: string; reasons: string[]; span: SourceSpan | null }[]
+  unavailable_evidence: UnavailableEvidence[]
 }
 
 export class ViewValidationError extends Error {
@@ -52,7 +63,34 @@ export class ViewValidationError extends Error {
 }
 const fail = (path: string, message: string): never => { throw new ViewValidationError(`${path}: ${message}`) }
 const encoder = new TextEncoder()
-const validateStructure = new Ajv2020({ allErrors: false, strict: true }).compile<AspicView>(schema)
+// The historical and current contracts retain their published $id; compile in
+// independent registries so one cannot shadow the other.
+const validateCurrent = new Ajv2020({ allErrors: false, strict: true }).compile<AspicView>(schema)
+const validateLegacy = new Ajv2020({ allErrors: false, strict: true }).compile<AspicView>(legacySchema)
+
+const groupDescriptions: Record<AvailabilityIssue, [string, string]> = {
+  predicate_not_met: ['Predicate not met', 'The observation was usable for comparison, but a declared condition did not hold. No premise was constructed.'],
+  missing_observation: ['Missing observation', 'No evidence record was supplied for the declaration.'],
+  stale_observation: ['Expired observation', 'The record exceeded its declared maximum age.'],
+  tool_error: ['Tool execution failed', 'The tool did not produce an ok observation.'],
+  invalid_observation: ['Invalid observation or comparison', 'Record identity, contents, timestamp, binding or a predicate operand could not be checked.'],
+  out_of_scope: ['Outside declared environment', 'The supplied context did not match the evidence declaration.'],
+  unclassified_legacy: ['Unclassified legacy evidence', 'The earlier export supplied text reasons without typed outcome codes; the browser does not infer a category.'],
+}
+
+/** Group only typed producer outcomes. An older /1 export is deliberately unclassified. */
+export function evidenceGroups(view: AspicView): EvidenceGroup[] {
+  const groups = new Map<AvailabilityIssue, UnavailableEvidence[]>()
+  for (const item of view.unavailable_evidence) {
+    const issues = view.schema === 'aspic-view/2'
+      ? item.availability_issues ?? ['unclassified_legacy'] as AvailabilityIssue[]
+      : ['unclassified_legacy'] as AvailabilityIssue[]
+    for (const issue of issues) groups.set(issue, [...(groups.get(issue) ?? []), item])
+  }
+  return [...groups].map(([issue, items]) => ({
+    issue, title: groupDescriptions[issue][0], explanation: groupDescriptions[issue][1], items,
+  }))
+}
 
 /** Grounded labelling of an abstract defeat graph; no ASPIC theory construction. */
 export function groundedLabels(ids: string[], defeats: Pick<AspicDefeat, 'attacker' | 'target'>[]): Map<string, Label> {
@@ -150,6 +188,8 @@ export function validateAspicView(value: unknown): AspicView {
   let encoded: string | undefined
   try { encoded = JSON.stringify(value) } catch { fail('view', 'expected serialisable JSON') }
   if (!encoded || encoder.encode(encoded).byteLength > MAX_FILE_BYTES) fail('view', 'exceeds the 4 MiB import limit or is not JSON')
+  const validateStructure = value !== null && typeof value === 'object' &&
+    (value as { schema?: unknown }).schema === 'aspic-view/1' ? validateLegacy : validateCurrent
   if (!validateStructure(value)) {
     const issue = validateStructure.errors?.[0]
     fail(issue?.instancePath || 'view', `${issue?.message ?? 'invalid export'}${issue?.params ? ` (${JSON.stringify(issue.params)})` : ''}`)

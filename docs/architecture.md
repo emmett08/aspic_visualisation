@@ -6,7 +6,7 @@
 |---|---|
 | EAL parser and authored evaluator | Resolve EAL declarations, check observations and local methods; remain the default assessment |
 | Opt-in EAL compiler and ASPIC+ method | Construct the bounded formal theory and compute arguments, defeats and grounded labels |
-| EAL JSON exporter | Recompute the formal result, require exact equality, project origins and emit `aspic-view/1` |
+| EAL JSON exporter | Recompute the formal result, require exact equality, project origins and emit `aspic-view/2` with typed evidence availability issues |
 | TypeScript domain layer | Check imported graph structure and grounded labelling, construct presentation elements and compare snapshots |
 | Vue components | Local file import, selection, source inspection, filters and session history |
 | Cytoscape.js | Render a single graph, pan/zoom, selection events and image export |

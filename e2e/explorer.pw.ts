@@ -76,19 +76,33 @@ test('renumbered snapshots compare by derivation and restore through events', as
   await expect(page.locator('.argument-id').first()).toHaveText('B0')
 })
 
-test('supplied prose is inert text and unavailable evidence is visible', async ({ page }) => {
+test('supplied prose is inert text and typed evidence outcomes stay distinct', async ({ page }) => {
   await page.goto('/')
   const view = structuredClone(sample)
   const hostile = '<img src=x onerror="window.injected=true">'
   view.arguments[0]!.authored_statement = hostile
-  view.unavailable_evidence.push({ name: 'missing_probe', reasons: ['No observation supplied.'], span: null })
+  view.unavailable_evidence.push({ name: 'missing_probe', reasons: ['No observation supplied.'],
+    availability_issues: ['missing_observation'], span: null })
+  view.unavailable_evidence.push({ name: 'failed_negative_predicate', reasons: ['Observed true, required false.'],
+    availability_issues: ['predicate_not_met'], span: null })
   await importView(page, view, 'supplied-text.json')
   await page.locator('.argument-row').first().click()
   await expect(page.locator('.details-panel .statement')).toHaveText(hostile)
   await expect(page.locator('.details-panel img')).toHaveCount(0)
   await expect(page.locator('.unavailable-section')).toContainText('missing_probe')
-  await expect(page.locator('.unavailable-section')).toContainText('Absence is not falsity')
+  await expect(page.locator('.evidence-group').filter({ hasText: 'Missing observation' })).toContainText('missing_probe')
+  await expect(page.locator('.evidence-group').filter({ hasText: 'Predicate not met' })).toContainText('failed_negative_predicate')
   expect(await page.evaluate(() => Object.hasOwn(window, 'injected'))).toBe(false)
+})
+
+test('legacy export keeps unavailable evidence unclassified', async ({ page }) => {
+  await page.goto('/')
+  const legacy = structuredClone(sample)
+  legacy.schema = 'aspic-view/1'
+  legacy.unavailable_evidence.push({ name: 'old_probe', reasons: ['No observation supplied.'], span: null })
+  await importView(page, legacy, 'legacy.json')
+  await expect(page.locator('.evidence-group')).toContainText('Unclassified legacy evidence')
+  await expect(page.locator('.evidence-group')).toContainText('old_probe')
 })
 
 test('mobile layout keeps graph and keyboard controls within the viewport', async ({ page }) => {
