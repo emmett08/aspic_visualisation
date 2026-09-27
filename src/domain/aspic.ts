@@ -13,7 +13,7 @@ export type FormalStatus = 'accepted' | 'rejected' | 'undecided' | 'unconstructe
 export type ClaimStatus = 'supported' | 'contested' | 'unsupported' | 'out_of_scope'
 export type DefeatKind = 'undermine' | 'rebut' | 'undercut'
 export interface SourceSpan { line: number; column: number; end_line: number; end_column: number }
-export interface FormalDirective {
+export interface ArgumentationDirective {
   kind: 'strict' | 'rank' | 'contrary'; name: string; other: string | null;
   rank: number | null; review: string; span: SourceSpan | null;
   target_kind: 'evidence' | 'assumption' | 'argument' | 'objection' | 'claim'
@@ -24,7 +24,7 @@ export interface Observation {
 }
 export interface ArgumentOrigin {
   kind: 'evidence' | 'argument' | 'assumption' | 'objection' | 'structural basis' | 'formal rule' | 'formal premise';
-  name: string; span?: SourceSpan | null; formal_review?: FormalDirective | null;
+  name: string; span?: SourceSpan | null; formal_review?: ArgumentationDirective | null;
   observation?: Observation | null; rationale?: string; reasoning?: string; meaning?: string
 }
 export interface AspicArgument {
@@ -35,7 +35,7 @@ export interface AspicArgument {
 }
 export interface AspicDefeat {
   attacker: string; target: string; subargument: string; kind: DefeatKind;
-  relation_origin?: { objection: string | null; annotation: FormalDirective | null }
+  relation_origin?: { objection: string | null; annotation: ArgumentationDirective | null }
 }
 export interface AspicView {
   schema: 'aspic-view/1'; profile: string; goal: string; goal_claim: string | null;
