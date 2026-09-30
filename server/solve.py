@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import sys
 
-EAL_REVISION = "7376526d5f0fd497cd41b25a1544c5fbb6e498ff"
+EAL_REVISION = "1a8d0df83051f264b3c843686f2a5d52029e7ecc"
 EXPECTED_IMPLEMENTATION = "eal-aspic-grounded-4"
 EXPECTED_PACKAGE = "3.0.0"
 MAX_REQUEST_BYTES = 64 * 1024

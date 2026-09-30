@@ -23,7 +23,7 @@ To construct arguments from the text areas, install Python 3.11+ and the pinned 
 
 ```sh
 python3 -m venv .venv
-.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@7376526d5f0fd497cd41b25a1544c5fbb6e498ff'
+.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@1a8d0df83051f264b3c843686f2a5d52029e7ecc'
 ASPIC_SOLVER=1 ASPIC_PYTHON="$PWD/.venv/bin/python" npm run dev -- --host 127.0.0.1
 ```
 
