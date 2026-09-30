@@ -49,7 +49,7 @@ class BridgeTests(unittest.TestCase):
         result = invoke({"theory": DEMO})
         self.assertEqual(result.returncode, 0, result.stderr.decode())
         view = json.loads(result.stdout)
-        self.assertEqual(view["schema"], "aspic-view/1")
+        self.assertEqual(view["schema"], "aspic-view/2")
         self.assertEqual(view["formal_status"], "accepted")
         self.assertEqual(view["validation"]["formal_result"], "recomputed")
         self.assertIsNone(view["claim_status"])

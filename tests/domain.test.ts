@@ -17,7 +17,7 @@ function view(arguments_: AspicArgument[], defeats: AspicDefeat[] = [], goal = a
   const labels = groundedLabels(arguments_.map(a => a.id), defeats)
   arguments_.forEach(a => { a.subarguments = closure(a); a.label = labels.get(a.id)! })
   const goalLabels = arguments_.filter(a => a.conclusion === goal).map(a => a.label)
-  return { schema: 'aspic-view/1', profile: 'test-profile/1', goal, goal_claim: null,
+  return { schema: 'aspic-view/2', profile: 'test-profile/1', goal, goal_claim: null,
     formal_status: goalLabels.includes('in') ? 'accepted' : goalLabels.includes('undecided') ? 'undecided' : goalLabels.length ? 'rejected' : 'unconstructed',
     claim_status: null, authored_claim_status: null, source_digest: null, snapshot_digest: null,
     theory_digest: '0'.repeat(64), evaluated_at: null, validation: { formal_result: 'recomputed', provenance: 'supplied' },
@@ -41,7 +41,7 @@ function renumber(input: AspicView): AspicView {
 
 describe('versioned import boundary', () => {
   it('keeps runtime limits aligned with the checked-in producer schema', () => {
-    expect(schema.properties.schema.const).toBe('aspic-view/1')
+    expect(schema.properties.schema.const).toBe('aspic-view/2')
     expect(schema.properties.arguments.maxItems).toBe(MAX_ARGUMENTS)
     expect(schema.properties.defeats.maxItems).toBe(MAX_DEFEATS)
     expect(schema.additionalProperties).toBe(false)
@@ -52,6 +52,37 @@ describe('versioned import boundary', () => {
     expect(sampleView.defeats).toHaveLength(1)
     expect(sampleView.arguments.some(a => a.top === 'strict')).toBe(true)
     expect(sampleView.formal_status).toBe('accepted')
+  })
+  it('preserves reviewed strictness and rank alongside immediate nested derivations', () => {
+    const input = validateAspicView(clone(sampleView))
+    const strict = input.arguments.find(a => a.origin.name === 'report_arg')!
+    expect(strict.top).toBe('strict')
+    expect(strict.origin.formal_review?.kind).toBe('strict')
+    expect(strict.origin.formal_review?.review).toBe('synthetic-review/checked-record-implication')
+    const parent = input.arguments.find(a => a.origin.name === 'independent_probe')!
+    const byId = new Map(input.arguments.map(a => [a.id, a]))
+    const child = byId.get(parent.direct_subarguments[0]!)!
+    expect(child.origin.name).toBe('probe_arg')
+    expect(child.direct_subarguments).toHaveLength(1)
+    expect(parent.subarguments).toContain(child.direct_subarguments[0])
+    expect(parent.rank).toBe(700)
+    expect(parent.origin.formal_review?.kind).toBe('rank')
+  })
+  it('requires v2 typed availability causes and keeps absence distinct from a failed predicate', () => {
+    const input = clone(sampleView)
+    input.unavailable_evidence = [
+      { name: 'missing', reasons: ['Synthetic absent observation.'], availability_issues: ['missing_observation'], span: null },
+      { name: 'negative', reasons: ['Synthetic observed predicate did not hold.'], availability_issues: ['predicate_not_met'], span: null },
+    ]
+    expect(validateAspicView(input).unavailable_evidence).toEqual(input.unavailable_evidence)
+    expect(() => validateAspicView({ ...input, schema: 'aspic-view/1' })).toThrow('constant')
+    const invalid = clone(input) as unknown as { unavailable_evidence: Record<string, unknown>[] }
+    delete invalid.unavailable_evidence[0]!.availability_issues
+    expect(() => validateAspicView(invalid)).toThrow('availability_issues')
+    invalid.unavailable_evidence[0]!.availability_issues = ['unknown']
+    expect(() => validateAspicView(invalid)).toThrow('allowed values')
+    invalid.unavailable_evidence[0]!.availability_issues = ['missing_observation', 'missing_observation']
+    expect(() => validateAspicView(invalid)).toThrow('duplicate')
   })
   it('rejects malformed JSON and legacy compiled-result envelopes', () => {
     expect(() => parseAspicView('{')).toThrow('invalid JSON')

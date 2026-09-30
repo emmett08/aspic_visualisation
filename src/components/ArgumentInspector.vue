@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { AspicView, AspicGraph } from "../domain/aspic";
+import { availabilityIssueText } from "../domain/aspic";
 
 const props = defineProps<{
   view: AspicView;
@@ -274,6 +275,11 @@ function selectEdge(id: string) {
           <summary>
             {{ textField(item, "name") || `Evidence ${index + 1}` }}
           </summary>
+          <ul class="availability-issues" aria-label="Evidence availability causes">
+            <li v-for="issue in item.availability_issues" :key="issue">
+              {{ availabilityIssueText[issue] }}
+            </li>
+          </ul>
           <pre>{{ pretty(item) }}</pre>
         </details>
       </section>

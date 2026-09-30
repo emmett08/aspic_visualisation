@@ -12,6 +12,17 @@ export type Label = 'in' | 'out' | 'undecided'
 export type FormalStatus = 'accepted' | 'rejected' | 'undecided' | 'unconstructed'
 export type ClaimStatus = 'supported' | 'contested' | 'unsupported' | 'out_of_scope'
 export type DefeatKind = 'undermine' | 'rebut' | 'undercut'
+export type AvailabilityIssue = 'predicate_not_met' | 'missing_observation' | 'stale_observation'
+  | 'tool_error' | 'invalid_observation' | 'out_of_scope' | 'unclassified_legacy'
+export const availabilityIssueText: Record<AvailabilityIssue, string> = {
+  predicate_not_met: 'The observed value did not meet the declared condition.',
+  missing_observation: 'No observation was supplied.',
+  stale_observation: 'The observation exceeded its permitted age.',
+  tool_error: 'Evidence collection failed.',
+  invalid_observation: 'The observation failed identity or data validation.',
+  out_of_scope: 'The observation was outside the declared scope.',
+  unclassified_legacy: 'The exporter did not classify the availability cause.',
+}
 export interface SourceSpan { line: number; column: number; end_line: number; end_column: number }
 export interface ArgumentationDirective {
   kind: 'strict' | 'rank' | 'contrary'; name: string; other: string | null;
@@ -38,13 +49,16 @@ export interface AspicDefeat {
   relation_origin?: { objection: string | null; annotation: ArgumentationDirective | null }
 }
 export interface AspicView {
-  schema: 'aspic-view/1'; profile: string; goal: string; goal_claim: string | null;
+  schema: 'aspic-view/2'; profile: string; goal: string; goal_claim: string | null;
   formal_status: FormalStatus; claim_status: ClaimStatus | null; authored_claim_status: ClaimStatus | null;
   source_digest: string | null; snapshot_digest: string | null; theory_digest: string;
   evaluated_at: string | null;
   validation: { formal_result: 'recomputed'; provenance: 'supplied' };
   arguments: AspicArgument[]; defeats: AspicDefeat[];
-  unavailable_evidence: { name: string; reasons: string[]; span: SourceSpan | null }[]
+  unavailable_evidence: {
+    name: string; reasons: string[]; availability_issues: AvailabilityIssue[];
+    span: SourceSpan | null
+  }[]
 }
 
 export class ViewValidationError extends Error {

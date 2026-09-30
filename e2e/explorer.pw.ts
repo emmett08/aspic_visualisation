@@ -81,13 +81,15 @@ test('supplied prose is inert text and unavailable evidence is visible', async (
   const view = structuredClone(sample)
   const hostile = '<img src=x onerror="window.injected=true">'
   view.arguments[0]!.authored_statement = hostile
-  view.unavailable_evidence.push({ name: 'missing_probe', reasons: ['No observation supplied.'], span: null })
+  view.unavailable_evidence.push({ name: 'missing_probe', reasons: ['No observation supplied.'], availability_issues: ['missing_observation'], span: null })
   await importView(page, view, 'supplied-text.json')
   await page.locator('.argument-row').first().click()
   await expect(page.locator('.details-panel .statement')).toHaveText(hostile)
   await expect(page.locator('.details-panel img')).toHaveCount(0)
   await expect(page.locator('.unavailable-section')).toContainText('missing_probe')
   await expect(page.locator('.unavailable-section')).toContainText('Absence is not falsity')
+  await page.locator('.unavailable-section summary').click()
+  await expect(page.getByLabel('Evidence availability causes')).toContainText('No observation was supplied.')
   expect(await page.evaluate(() => Object.hasOwn(window, 'injected'))).toBe(false)
 })
 
@@ -100,4 +102,24 @@ test('mobile layout keeps graph and keyboard controls within the viewport', asyn
   await expect(page.locator('.argument-row')).toHaveCount(1)
   await page.locator('.argument-row').press('Enter')
   await expect(page.locator('.details-panel h3')).toHaveText('primary_trace_gap')
+})
+
+
+test('reviewed nested derivations are inspectable and old views cannot replace the graph', async ({ page }) => {
+  await page.goto('/')
+  const nested = sample.arguments.findIndex(a => a.origin.name === 'independent_probe')
+  await page.locator('.argument-row').nth(nested).click()
+  await expect(page.locator('.details-panel')).toContainText('Direct subarguments')
+  await expect(page.locator('.details-panel')).toContainText('synthetic-review/independent-probe')
+  const childId = sample.arguments[nested]!.direct_subarguments[0]!
+  await page.locator('.details-panel .inline-buttons').getByRole('button', { name: childId, exact: true }).click()
+  await expect(page.locator('.details-panel')).toContainText('probe_arg')
+  await expect(page.locator('.details-panel h3')).toHaveText('alternate_probe_ok')
+  const strict = sample.arguments.findIndex(a => a.origin.name === 'report_arg')
+  await page.locator('.argument-row').nth(strict).click()
+  await expect(page.locator('.details-panel')).toContainText('synthetic-review/checked-record-implication')
+  await importView(page, { ...sample, schema: 'aspic-view/1' }, 'obsolete-view.json')
+  await expect(page.getByRole('alert')).toContainText('constant')
+  await expect(page.locator('.event-card')).toHaveCount(1)
+  await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
 })

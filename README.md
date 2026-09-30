@@ -23,7 +23,7 @@ To construct arguments from the text areas, install Python 3.11+ and the pinned 
 
 ```sh
 python3 -m venv .venv
-.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@a31d2cf05c8ef5145612c53a46650faf89a80bc0'
+.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@f4b662c2d0a4a98a8765af47f921d701607a059a'
 ASPIC_SOLVER=1 ASPIC_PYTHON="$PWD/.venv/bin/python" npm run dev -- --host 127.0.0.1
 ```
 
@@ -46,7 +46,7 @@ Only explicitly submitted theories are sent to the local Python process. The bri
 
 ## Bring an EAL assessment
 
-Use the companion implementation in [EAL PR #29](https://github.com/emmett08/earl/pull/29):
+Use the pinned companion EAL implementation from [EAL PR #49](https://github.com/emmett08/earl/pull/49):
 
 ```sh
 # In an EAL workspace, save the full compile-aspic response as result.json.
@@ -59,14 +59,18 @@ Or generate the maintained synthetic example from the EAL repository:
 python examples/api-load-test/aspic_compiled_demo.py --export-view /tmp/view.json
 ```
 
-Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The app consumes the versioned [`aspic-view/1` JSON contract](schema/aspic-view.schema.json), not EAL source text.
+Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The app consumes the versioned [`aspic-view/2` JSON contract](schema/aspic-view.schema.json), not EAL source text.
 
 - Solid derivation edges connect an immediate subargument to the argument using it. Reused evidence remains one node.
 - Dashed defeat edges connect attacker to defeated argument. The inspector identifies the exact attacked subargument and whether the defeat undermines, rebuts or undercuts.
 - `in`, `out` and `undecided` are grounded labels, not truth values. A strict inference may still depend on fallible premises.
-- Source text, rationale, declaration location, observation metadata and review references remain inspectable. Missing observations appear separately and never become negative premises.
+- Source text, rationale, declaration location, observation metadata and review references remain inspectable. Unavailable evidence has typed causes such as `missing_observation`, `stale_observation` and `predicate_not_met`; an observed failed condition remains distinct from an absent observation. These entries never become negative premises.
 - Search and the argument list provide keyboard access to graph selection. Relation filters and neighbourhood focus make hidden graph content explicit.
 - Import successive snapshots to record session events and compare added, removed and relabelled derivations. Restoring an event restores its graph. Import order is not evidence chronology or a solver execution trace; differing source or assessment identities remain visible.
+
+EAL's newline-based source notation supports scoped metadata and typed pattern instances. For example, an argument using `[premises measured] via rule => reportable` depends on a claim that another argument or `apply` instance establishes. The exporter constructs these nested derivations, and this app displays their immediate links and shared evidence. Inline nested argument declarations and recursive or nested pattern applications are outside EAL's grammar. Reviewed `strict`, `rank` and `contrary` directives retain their formal-compilation meaning; ordinary EAL claim assessment is a separate contract.
+
+The import contract is `aspic-view/2`, matching the producer schema exactly. Regenerate older exports with the pinned EAL implementation before importing them.
 
 ## Trust boundary
 

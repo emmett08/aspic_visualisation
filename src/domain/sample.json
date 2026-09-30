@@ -1,5 +1,5 @@
 {
-  "schema": "aspic-view/1",
+  "schema": "aspic-view/2",
   "theory_digest": "2bd2a124b9e4c3bf8319862706969b2d5ebe47bd5d6e75d50758577f2024271e",
   "evaluated_at": "2026-09-25T10:00:30Z",
   "validation": {
@@ -12,8 +12,8 @@
   "formal_status": "accepted",
   "claim_status": "supported",
   "authored_claim_status": "supported",
-  "source_digest": "2ec7a3fcab449de528e7e43ee1923bbbf46d0bcb2f4bd66b6d65b427da24768c",
-  "snapshot_digest": "fb4ca7e84ffc7139dba214dc32868c626a62895b8bfec39515d4a84bb7e53379",
+  "source_digest": "6ac9aa28b0c19f80587c2403c3627efa15233d797f4d68fd85a1d5cf0eef38e4",
+  "snapshot_digest": "fe73cbf71bb37edeac3a93c688e7286bd54db25309ea1cb7af439a33e5f4f733",
   "arguments": [
     {
       "conclusion": "ef041a8271909948b0680",
@@ -28,18 +28,18 @@
         "kind": "evidence",
         "name": "checked_record",
         "span": {
-          "line": 9,
-          "column": 1,
-          "end_line": 12,
-          "end_column": 2
+          "line": 15,
+          "column": 3,
+          "end_line": 19,
+          "end_column": 4
         },
         "formal_review": null,
         "observation": {
-          "run_id": "37d261f7-edd2-4d0b-9553-8eeaccf1e17e",
+          "run_id": "02b28ef5-6512-444f-b086-5a99359ca0c8",
           "data_digest": "22d5961de159f5aa84b2ca796d00460e0d516f6c3756278323b5cdc3678933cd",
           "request_digest": "0238e7ded4d0c030106e8509272687e1af60188a46ec27dc7886ac202617c8af",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
         }
       },
       "display_conclusion": "checked_record"
@@ -57,18 +57,18 @@
         "kind": "evidence",
         "name": "gap_record",
         "span": {
-          "line": 17,
-          "column": 1,
-          "end_line": 20,
-          "end_column": 2
+          "line": 27,
+          "column": 3,
+          "end_line": 31,
+          "end_column": 4
         },
         "formal_review": null,
         "observation": {
-          "run_id": "9cddd29e-bcca-486e-9fab-6c6aa292fd6f",
+          "run_id": "182b4669-739b-4b63-a228-809265b04cac",
           "data_digest": "08211cdf62af82b8652d35acab2a6a7b17f003694613e7b61a9f9e3d6e1b73ed",
           "request_digest": "e08ba75764af5d98cc3b96d5c92c66fc6d8c6921ec55472dd1a1d243961a4187",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
         }
       },
       "display_conclusion": "gap_record"
@@ -86,18 +86,18 @@
         "kind": "evidence",
         "name": "latency_record",
         "span": {
-          "line": 13,
-          "column": 1,
-          "end_line": 16,
-          "end_column": 2
+          "line": 21,
+          "column": 3,
+          "end_line": 25,
+          "end_column": 4
         },
         "formal_review": null,
         "observation": {
-          "run_id": "4360328c-682d-4392-8b75-c7c08f0ebcad",
+          "run_id": "b81a7fda-017f-4ed1-8d78-4bf8ec2544ec",
           "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
           "request_digest": "3236a96d7a4f74c6c652524ec619cf50ef1a16b077c302c9ec4c0138fea449df",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
         }
       },
       "display_conclusion": "latency_record"
@@ -115,10 +115,10 @@
         "kind": "evidence",
         "name": "probe_record",
         "span": {
-          "line": 21,
-          "column": 1,
-          "end_line": 24,
-          "end_column": 2
+          "line": 33,
+          "column": 3,
+          "end_line": 37,
+          "end_column": 4
         },
         "formal_review": {
           "kind": "rank",
@@ -127,19 +127,19 @@
           "rank": 700,
           "review": "synthetic-review/probe-observation",
           "span": {
-            "line": 57,
-            "column": 1,
-            "end_line": 57,
-            "end_column": 69
+            "line": 84,
+            "column": 3,
+            "end_line": 85,
+            "end_column": 1
           },
           "target_kind": "evidence"
         },
         "observation": {
-          "run_id": "a3392755-93dd-412b-84a7-9c5c3a86fb35",
+          "run_id": "50a36b41-1567-43f7-b842-99b77222b942",
           "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
           "request_digest": "f7a46d318c7a7d49fc04bd8508d5c9fda84d44cd89c42e0a7cb4ebaba188fc8f",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "357f56b0648ecd774c9f3ebc17cc86d61a40efeac130696d2bc6fde07e7702a3"
+          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
         }
       },
       "display_conclusion": "probe_record"
@@ -163,10 +163,10 @@
         "kind": "argument",
         "name": "gap_arg",
         "span": {
-          "line": 46,
-          "column": 1,
-          "end_line": 46,
-          "end_column": 84
+          "line": 68,
+          "column": 3,
+          "end_line": 70,
+          "end_column": 1
         },
         "formal_review": null,
         "rationale": "The stipulated finding concerns only the identified synthetic run.",
@@ -194,10 +194,10 @@
         "kind": "argument",
         "name": "probe_arg",
         "span": {
-          "line": 47,
-          "column": 1,
-          "end_line": 47,
-          "end_column": 97
+          "line": 76,
+          "column": 3,
+          "end_line": 78,
+          "end_column": 1
         },
         "formal_review": null,
         "rationale": "The stipulated finding concerns only the identified synthetic run.",
@@ -225,10 +225,10 @@
         "kind": "argument",
         "name": "latency_arg",
         "span": {
-          "line": 45,
-          "column": 1,
-          "end_line": 45,
-          "end_column": 93
+          "line": 66,
+          "column": 3,
+          "end_line": 68,
+          "end_column": 1
         },
         "formal_review": null,
         "rationale": "The stipulated finding concerns only the identified synthetic run.",
@@ -254,10 +254,10 @@
         "kind": "argument",
         "name": "report_arg",
         "span": {
-          "line": 44,
-          "column": 1,
-          "end_line": 44,
-          "end_column": 96
+          "line": 64,
+          "column": 3,
+          "end_line": 66,
+          "end_column": 1
         },
         "formal_review": {
           "kind": "strict",
@@ -266,10 +266,10 @@
           "rank": null,
           "review": "synthetic-review/checked-record-implication",
           "span": {
-            "line": 55,
-            "column": 1,
-            "end_line": 55,
-            "end_column": 74
+            "line": 80,
+            "column": 3,
+            "end_line": 82,
+            "end_column": 1
           },
           "target_kind": "argument"
         },
@@ -299,10 +299,10 @@
         "kind": "argument",
         "name": "independent_probe",
         "span": {
-          "line": 51,
-          "column": 1,
-          "end_line": 53,
-          "end_column": 2
+          "line": 72,
+          "column": 3,
+          "end_line": 74,
+          "end_column": 1
         },
         "formal_review": {
           "kind": "rank",
@@ -311,10 +311,10 @@
           "rank": 700,
           "review": "synthetic-review/independent-probe",
           "span": {
-            "line": 56,
-            "column": 1,
-            "end_line": 56,
-            "end_column": 74
+            "line": 82,
+            "column": 3,
+            "end_line": 84,
+            "end_column": 1
           },
           "target_kind": "argument"
         },
@@ -347,10 +347,10 @@
         "kind": "argument",
         "name": "primary_run",
         "span": {
-          "line": 48,
-          "column": 1,
-          "end_line": 50,
-          "end_column": 2
+          "line": 70,
+          "column": 3,
+          "end_line": 72,
+          "end_column": 1
         },
         "formal_review": null,
         "rationale": "The stipulated finding concerns only the identified synthetic run.",
@@ -379,10 +379,10 @@
         "kind": "objection",
         "name": "primary_trace_gap",
         "span": {
-          "line": 54,
-          "column": 1,
-          "end_line": 54,
-          "end_column": 81
+          "line": 78,
+          "column": 3,
+          "end_line": 80,
+          "end_column": 1
         },
         "formal_review": null
       },
