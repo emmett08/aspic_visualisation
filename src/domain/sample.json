@@ -6,14 +6,14 @@
     "formal_result": "recomputed",
     "provenance": "supplied"
   },
-  "profile": "EAL/2-compiled-aspic/4",
+  "profile": "EAL/3-compiled-aspic/4",
   "goal": "c7d0843fae823cf542bd6",
   "goal_claim": "run_passes",
   "formal_status": "accepted",
   "claim_status": "supported",
   "authored_claim_status": "supported",
-  "source_digest": "6ac9aa28b0c19f80587c2403c3627efa15233d797f4d68fd85a1d5cf0eef38e4",
-  "snapshot_digest": "fe73cbf71bb37edeac3a93c688e7286bd54db25309ea1cb7af439a33e5f4f733",
+  "source_digest": "d03429acf2c1fb32971b67fe290c167869e9ebe618b6c71a614a9c0846047411",
+  "snapshot_digest": "bd8b0bed870a36cc8b2ef382f482479d581c255370a1431472203ce5c6236057",
   "arguments": [
     {
       "conclusion": "ef041a8271909948b0680",
@@ -35,11 +35,11 @@
         },
         "formal_review": null,
         "observation": {
-          "run_id": "02b28ef5-6512-444f-b086-5a99359ca0c8",
+          "run_id": "b88f7011-9aa0-4ee6-b4f6-272bece0319c",
           "data_digest": "22d5961de159f5aa84b2ca796d00460e0d516f6c3756278323b5cdc3678933cd",
           "request_digest": "0238e7ded4d0c030106e8509272687e1af60188a46ec27dc7886ac202617c8af",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
+          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
         }
       },
       "display_conclusion": "checked_record"
@@ -64,11 +64,11 @@
         },
         "formal_review": null,
         "observation": {
-          "run_id": "182b4669-739b-4b63-a228-809265b04cac",
+          "run_id": "f6a2a31a-4077-429a-aec2-f5b6cc4bc5de",
           "data_digest": "08211cdf62af82b8652d35acab2a6a7b17f003694613e7b61a9f9e3d6e1b73ed",
           "request_digest": "e08ba75764af5d98cc3b96d5c92c66fc6d8c6921ec55472dd1a1d243961a4187",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
+          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
         }
       },
       "display_conclusion": "gap_record"
@@ -93,11 +93,11 @@
         },
         "formal_review": null,
         "observation": {
-          "run_id": "b81a7fda-017f-4ed1-8d78-4bf8ec2544ec",
+          "run_id": "8074d026-8371-4eff-b0ec-78ba52eba00f",
           "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
           "request_digest": "3236a96d7a4f74c6c652524ec619cf50ef1a16b077c302c9ec4c0138fea449df",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
+          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
         }
       },
       "display_conclusion": "latency_record"
@@ -135,11 +135,11 @@
           "target_kind": "evidence"
         },
         "observation": {
-          "run_id": "50a36b41-1567-43f7-b842-99b77222b942",
+          "run_id": "18309033-197f-4352-8e8a-bd7e7ef25001",
           "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
           "request_digest": "f7a46d318c7a7d49fc04bd8508d5c9fda84d44cd89c42e0a7cb4ebaba188fc8f",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "dde11c058017437acd3dc63792346ff75ff83d19f9885de67871e840baff0c7a"
+          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
         }
       },
       "display_conclusion": "probe_record"

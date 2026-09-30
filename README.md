@@ -19,11 +19,11 @@ Open the printed local address. Files are parsed in the browser and are not uplo
 
 ### Optional theory editor
 
-To construct arguments from the text areas, install Python 3.11+ and the pinned companion EAL implementation, then enable the development-only bridge:
+To construct arguments from the text areas, install Python 3.11+ and the pinned companion EAL/3 implementation, then enable the development-only bridge:
 
 ```sh
 python3 -m venv .venv
-.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@f4b662c2d0a4a98a8765af47f921d701607a059a'
+.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@7376526d5f0fd497cd41b25a1544c5fbb6e498ff'
 ASPIC_SOLVER=1 ASPIC_PYTHON="$PWD/.venv/bin/python" npm run dev -- --host 127.0.0.1
 ```
 
@@ -46,7 +46,7 @@ Only explicitly submitted theories are sent to the local Python process. The bri
 
 ## Bring an EAL assessment
 
-Use the pinned companion EAL implementation from [EAL PR #49](https://github.com/emmett08/earl/pull/49):
+Use the pinned companion EAL/3 implementation from [EAL PR #49](https://github.com/emmett08/earl/pull/49):
 
 ```sh
 # In an EAL workspace, save the full compile-aspic response as result.json.
@@ -93,3 +93,8 @@ npm run test:browser
 ```
 
 Dependencies are pinned and `package-lock.json` is committed. See [architecture](docs/architecture.md) for the module boundary and comparison rules. Vue text interpolation and Cytoscape labels render imported values as text; imported HTML is never executed.
+
+The bundled engineering snapshot is generated from EAL/3 source by the companion
+compiler, including a typed pattern instance, nested premise derivations and reviewed
+ASPIC+ annotations. [Cloud browser verification and screenshots](docs/verification-eal3.md)
+record an actual local import of this sample.

@@ -9,8 +9,9 @@ from __future__ import annotations
 import json
 import sys
 
-EAL_REVISION = "f4b662c2d0a4a98a8765af47f921d701607a059a"
+EAL_REVISION = "7376526d5f0fd497cd41b25a1544c5fbb6e498ff"
 EXPECTED_IMPLEMENTATION = "eal-aspic-grounded-4"
+EXPECTED_PACKAGE = "3.0.0"
 MAX_REQUEST_BYTES = 64 * 1024
 
 
@@ -34,11 +35,13 @@ def solve_request(raw: bytes) -> dict:
     if type(payload) is not dict or set(payload) != {"theory"}:
         raise ValueError("Request must contain exactly one theory object")
 
+    from eal import __version__
     from eal.aspic import ASPIC_CONTRACT
     from eal.aspic_export import export_aspic_view
     from eal.methods import execute_extension
 
-    if ASPIC_CONTRACT.implementation_version != EXPECTED_IMPLEMENTATION:
+    if (__version__ != EXPECTED_PACKAGE or
+            ASPIC_CONTRACT.implementation_version != EXPECTED_IMPLEMENTATION):
         raise RuntimeError("Install the reviewed EAL revision " + EAL_REVISION)
     computation = execute_extension(ASPIC_CONTRACT, payload)
     if computation["status"] != "supported":
