@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { AspicView, AspicGraph } from "../domain/aspic";
+import { availabilityIssueText, availabilityIssueTitle, evidenceGroups } from "../domain/aspic";
 
 const props = defineProps<{
   view: AspicView;
@@ -12,6 +13,7 @@ const emit = defineEmits<{
   selectArgument: [id: string];
   selectEdge: [id: string];
 }>();
+const groups = computed(() => evidenceGroups(props.view));
 const argument = computed(() =>
   props.view.arguments.find((a) => a.id === props.selectedArgument),
 );
@@ -139,8 +141,14 @@ function selectEdge(id: string) {
             }}
           </p>
         </section>
+        <section v-if="argument.origin.scope_transfer" class="detail-section">
+          <h4>Conditional scope transfer</h4>
+          <pre>{{ pretty(argument.origin.scope_transfer) }}</pre>
+          <p class="small-note">Proposition correspondence is checked by EAL. The transfer justification is an authored assumption.</p>
+        </section>
         <section v-if="field(argument.origin, 'span')" class="detail-section">
           <h4>Source location</h4>
+          <p v-if="argument.origin.source_file">{{ argument.origin.source_file }}</p>
           <pre>{{ pretty(field(argument.origin, "span")) }}</pre>
         </section>
         <section
@@ -267,15 +275,17 @@ function selectEdge(id: string) {
         <p>
           These declarations did not supply a premise. Absence is not falsity.
         </p>
-        <details
-          v-for="(item, index) in view.unavailable_evidence"
-          :key="index"
-        >
-          <summary>
-            {{ textField(item, "name") || `Evidence ${index + 1}` }}
-          </summary>
-          <pre>{{ pretty(item) }}</pre>
-        </details>
+        <section v-for="group in groups" :key="group.issue" class="evidence-group" :data-issue="group.issue">
+          <h5>{{ availabilityIssueTitle[group.issue] }} <span>{{ group.items.length }}</span></h5>
+          <p>{{ group.description }}</p>
+          <details v-for="item in group.items" :key="item.name">
+            <summary>{{ item.name }}</summary>
+            <ul class="availability-issues" aria-label="Evidence availability causes">
+              <li v-for="issue in item.availability_issues" :key="issue">{{ availabilityIssueText[issue] }}</li>
+            </ul>
+            <pre>{{ pretty(item) }}</pre>
+          </details>
+        </section>
       </section>
     </div>
     <div class="provenance-note">

@@ -65,6 +65,7 @@ test('renumbered snapshots compare by derivation and restore through events', as
   renumbered.defeats.forEach(d => {
     d.attacker = ids.get(d.attacker)!; d.target = ids.get(d.target)!; d.subargument = ids.get(d.subargument)!
   })
+  renumbered.extensions = renumbered.extensions.map(extension => extension.map(id => ids.get(id)!))
   await importView(page, renumbered, 'renumbered.json')
   await expect(page.locator('.event-card')).toHaveCount(2)
   await expect(page.locator('.event-diff')).toContainText('+0 arguments')
@@ -81,13 +82,15 @@ test('supplied prose is inert text and unavailable evidence is visible', async (
   const view = structuredClone(sample)
   const hostile = '<img src=x onerror="window.injected=true">'
   view.arguments[0]!.authored_statement = hostile
-  view.unavailable_evidence.push({ name: 'missing_probe', reasons: ['No observation supplied.'], span: null })
+  view.unavailable_evidence.push({ name: 'missing_probe', reasons: ['No observation supplied.'], availability_issues: ['missing_observation'], span: null })
   await importView(page, view, 'supplied-text.json')
   await page.locator('.argument-row').first().click()
   await expect(page.locator('.details-panel .statement')).toHaveText(hostile)
   await expect(page.locator('.details-panel img')).toHaveCount(0)
   await expect(page.locator('.unavailable-section')).toContainText('missing_probe')
   await expect(page.locator('.unavailable-section')).toContainText('Absence is not falsity')
+  await page.locator('.unavailable-section summary').click()
+  await expect(page.getByLabel('Evidence availability causes')).toContainText('No observation was supplied.')
   expect(await page.evaluate(() => Object.hasOwn(window, 'injected'))).toBe(false)
 })
 
@@ -100,4 +103,58 @@ test('mobile layout keeps graph and keyboard controls within the viewport', asyn
   await expect(page.locator('.argument-row')).toHaveCount(1)
   await page.locator('.argument-row').press('Enter')
   await expect(page.locator('.details-panel h3')).toHaveText('primary_trace_gap')
+})
+
+
+test('reviewed nested derivations are inspectable and old views cannot replace the graph', async ({ page }) => {
+  await page.goto('/')
+  const nested = sample.arguments.findIndex(a => a.origin.name === 'independent_probe')
+  await page.locator('.argument-row').nth(nested).click()
+  await expect(page.locator('.details-panel')).toContainText('Direct subarguments')
+  await expect(page.locator('.details-panel')).toContainText('synthetic-review/independent-probe')
+  const childId = sample.arguments[nested]!.direct_subarguments[0]!
+  await page.locator('.details-panel .inline-buttons').getByRole('button', { name: childId, exact: true }).click()
+  await expect(page.locator('.details-panel')).toContainText('probe_arg')
+  await expect(page.locator('.details-panel h3')).toHaveText('alternate_probe_ok')
+  const strict = sample.arguments.findIndex(a => a.origin.name === 'report_arg')
+  await page.locator('.argument-row').nth(strict).click()
+  await expect(page.locator('.details-panel')).toContainText('synthetic-review/checked-record-implication')
+  await importView(page, { ...sample, schema: 'aspic-view/1' }, 'obsolete-view.json')
+  await expect(page.getByRole('alert')).toContainText('constant')
+  await expect(page.locator('.event-card')).toHaveCount(1)
+  await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+})
+
+test('failed predicates and absent observations have separate typed panels', async ({page}) => {
+  await page.goto('/')
+  const value=structuredClone(sample)
+  value.unavailable_evidence.push({name:'missing_probe',reasons:['No observation supplied.'],availability_issues:['missing_observation'],span:null})
+  value.unavailable_evidence.push({name:'negative_predicate',reasons:['Observed true, required false.'],availability_issues:['predicate_not_met'],span:null})
+  await importView(page,value,'evidence-outcomes.json')
+  await expect(page.locator('.evidence-group[data-issue="missing_observation"]')).toContainText('missing_probe')
+  await expect(page.locator('.evidence-group[data-issue="predicate_not_met"]')).toContainText('negative_predicate')
+  await expect(page.locator('.evidence-group[data-issue="predicate_not_met"]')).not.toContainText('missing_probe')
+})
+
+test('selected extension labels preserve the grounded graph and restore on snapshot changes', async ({page}) => {
+  await page.goto('/')
+  await page.getByLabel('Graph labelling').selectOption({label:`grounded extension 1 · ${sample.extensions[0]!.length} in`})
+  await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+  await importView(page,sample,'new-snapshot.json')
+  await expect(page.getByLabel('Graph labelling')).toHaveValue('Grounded')
+  await page.getByRole('button',{name:'Snapshot details'}).click()
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('Grounded graph status')
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('sceptical')
+})
+
+test('actual recursive pattern snapshot exposes the reviewed partial priority', async ({page}) => {
+  const scoped=JSON.parse(readFileSync(new URL('../tests/fixtures/scoped-review.json',import.meta.url),'utf8'))
+  await page.goto('/')
+  await importView(page,scoped,'scoped-review.json')
+  await page.getByRole('button',{name:'Snapshot details'}).click()
+  await page.getByText('Reviewed directives · 2').click()
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('prefer release.checks.rest.item')
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('synthetic-review/route-order')
+  await page.getByLabel('Graph labelling').selectOption({label:'preferred extension 1 · 7 in'})
+  await expect(page.locator('.argument-row')).toHaveCount(10)
 })

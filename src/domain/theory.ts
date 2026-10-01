@@ -6,6 +6,10 @@ export interface TheoryFields {
   defeasibleRules: string
   contraries: string
   goal: string
+  semantics?: 'grounded' | 'preferred' | 'stable'
+  queryMode?: 'credulous' | 'sceptical'
+  preference?: 'minimum_rank' | 'last_link_rank' | 'last_link_partial'
+  priorities?: string
 }
 
 export interface ExplicitTheory {
@@ -13,11 +17,13 @@ export interface ExplicitTheory {
   rules: ({ id: string; kind: 'strict'; antecedents: string[]; consequent: string } |
     { id: string; kind: 'defeasible'; antecedents: string[]; consequent: string; name: string; rank: number })[]
   contraries: { attacker: string; target: string }[]
+  options?: { semantics: string; query_mode: string; preference: string }
+  priorities?: { kind: 'premise' | 'rule'; higher: string; lower: string }[]
   goal: string
 }
 
 export const emptyTheoryFields = (): TheoryFields => ({
-  axioms: '', premises: '', strictRules: '', defeasibleRules: '', contraries: '', goal: '',
+  axioms: '', premises: '', strictRules: '', defeasibleRules: '', contraries: '', goal: '', semantics: 'grounded', queryMode: 'sceptical', preference: 'minimum_rank', priorities: '',
 })
 
 /** Synthetic pump-readiness example: a challenged test and an independent inspection. */
@@ -27,7 +33,7 @@ export const engineeringDemo: Readonly<TheoryFields> = {
   strictRules: 's1: voltage_ok -> power_ok',
   defeasibleRules: 'd1: test_pass, power_ok => pump_ready\nd2: vibration => unreliable_test\nd3: inspection_ok => pump_ready @ 700',
   contraries: 'unreliable_test -> applicable_d1',
-  goal: 'pump_ready',
+  goal: 'pump_ready', semantics: 'grounded', queryMode: 'sceptical', preference: 'minimum_rank', priorities: '',
 }
 
 const literal = /^~?[A-Za-z][A-Za-z0-9_]{0,63}$/
@@ -81,7 +87,7 @@ export function parseTheoryFields(fields: TheoryFields): ExplicitTheory {
       theory.premises.push(kind === 'axiom' ? { atom: premise, kind } : { atom: premise, kind, rank: parsed.rank })
     }
   }
-  if (!theory.premises.length || theory.premises.length > 64) invalid('Premises', 'provide between 1 and 64 axioms and ordinary premises in total')
+  if (!theory.premises.length || theory.premises.length > 4096) invalid('Premises', 'provide between 1 and 4096 axioms and ordinary premises in total')
 
   const ruleIds = new Set<string>()
   for (const kind of ['strict', 'defeasible'] as const) {
@@ -97,14 +103,14 @@ export function parseTheoryFields(fields: TheoryFields): ExplicitTheory {
       if (ruleIds.has(id)) invalid(line.where, `duplicate rule ID ${id}`)
       ruleIds.add(id)
       const antecedents = match[2]!.split(',').map(part => atom(part, line.where))
-      if (antecedents.length > 8) invalid(line.where, 'a rule may have at most 8 antecedents')
+      if (antecedents.length > 128) invalid(line.where, 'a rule may have at most 128 antecedents')
       if (new Set(antecedents).size !== antecedents.length) invalid(line.where, 'a rule cannot repeat an antecedent')
       const consequent = atom(match[4]!, line.where)
       theory.rules.push(kind === 'strict' ? { id, kind, antecedents, consequent } :
         { id, kind, antecedents, consequent, name: `applicable_${id}`, rank: parsed.rank })
     }
   }
-  if (theory.rules.length > 64) invalid('Rules', 'provide at most 64 rules in total')
+  if (theory.rules.length > 4096) invalid('Rules', 'provide at most 4096 rules in total')
 
   const pairs = new Set<string>()
   for (const line of lines(fields.contraries, 'Contraries')) {
@@ -118,13 +124,27 @@ export function parseTheoryFields(fields: TheoryFields): ExplicitTheory {
     pairs.add(key)
     theory.contraries.push({ attacker, target })
   }
-  if (theory.contraries.length > 128) invalid('Contraries', 'provide at most 128 directed pairs')
+  if (theory.contraries.length > 4096) invalid('Contraries', 'provide at most 4096 directed pairs')
   const atoms = new Set([theory.goal, ...premiseAtoms])
   for (const rule of theory.rules) {
     rule.antecedents.forEach(value => atoms.add(value)); atoms.add(rule.consequent)
     if (rule.kind === 'defeasible') atoms.add(rule.name)
   }
   for (const pair of theory.contraries) { atoms.add(pair.attacker); atoms.add(pair.target) }
-  if (atoms.size > 128) invalid('Theory', 'provide at most 128 distinct atoms, including rule applicability names')
+  if (atoms.size > 4096) invalid('Theory', 'provide at most 4096 distinct atoms, including rule applicability names')
+  const semantics = fields.semantics ?? 'grounded'
+  const query_mode = fields.queryMode ?? 'sceptical'
+  const preference = fields.preference ?? 'minimum_rank'
+  if (!['grounded','preferred','stable'].includes(semantics) || !['credulous','sceptical'].includes(query_mode) || !['minimum_rank','last_link_rank','last_link_partial'].includes(preference)) invalid('Assessment', 'unknown semantics, query mode or preference')
+  if (semantics !== 'grounded' || query_mode !== 'sceptical' || preference !== 'minimum_rank') theory.options = { semantics, query_mode, preference }
+  const priorities = lines(fields.priorities ?? '', 'Priorities')
+  if (priorities.length) {
+    if (preference !== 'last_link_partial') invalid('Priorities', 'select partial last-link preference')
+    theory.priorities = priorities.map(line => {
+      const match = /^(premise|rule)\s+(\S+)\s*>\s*(\S+)$/.exec(line.text)
+      if (!match) invalid(line.where, 'use premise p > q or rule d1 > d2')
+      return {kind: match[1] as 'premise' | 'rule', higher: atom(match[2]!,line.where), lower:atom(match[3]!,line.where)}
+    })
+  }
   return theory
 }

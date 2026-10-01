@@ -49,7 +49,7 @@ class BridgeTests(unittest.TestCase):
         result = invoke({"theory": DEMO})
         self.assertEqual(result.returncode, 0, result.stderr.decode())
         view = json.loads(result.stdout)
-        self.assertEqual(view["schema"], "aspic-view/1")
+        self.assertEqual(view["schema"], "aspic-view/3")
         self.assertEqual(view["formal_status"], "accepted")
         self.assertEqual(view["validation"]["formal_result"], "recomputed")
         self.assertIsNone(view["claim_status"])
@@ -68,12 +68,12 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(result.stdout, b"")
         self.assertIn(b"exactly one theory", result.stderr)
 
-    def test_rejects_cycle(self):
+    def test_constructs_finite_premise_founded_cycle(self):
         theory = copy.deepcopy(DEMO)
         theory["rules"].append({"id": "loop", "kind": "strict", "antecedents": ["run_passes"], "consequent": "latency_record"})
         result = invoke({"theory": theory})
-        self.assertEqual(result.returncode, 2)
-        self.assertIn(b"atom cycle", result.stderr)
+        self.assertEqual(result.returncode, 0, result.stderr.decode())
+        self.assertEqual(json.loads(result.stdout)['query_status'], 'accepted')
 
     def test_rejects_premise_bound(self):
         theory = {"premises": [{"atom": f"p{i}", "kind": "axiom"} for i in range(65)], "rules": [], "contraries": [], "goal": "p0"}
