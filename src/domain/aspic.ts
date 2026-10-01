@@ -6,14 +6,14 @@ import schema from '../../schema/aspic-view.schema.json'
  * that a supplied graph contains every argument/defeat of an underlying theory.
  */
 export const MAX_FILE_BYTES = 4 * 1024 * 1024
-export const MAX_ARGUMENTS = 128
-export const MAX_DEFEATS = 4096
+export const MAX_ARGUMENTS = 4096
+export const MAX_DEFEATS = 65536
 export type Label = 'in' | 'out' | 'undecided'
 export type FormalStatus = 'accepted' | 'rejected' | 'undecided' | 'unconstructed'
 export type ClaimStatus = 'supported' | 'contested' | 'unsupported' | 'out_of_scope'
 export type DefeatKind = 'undermine' | 'rebut' | 'undercut'
 export type AvailabilityIssue = 'predicate_not_met' | 'missing_observation' | 'stale_observation'
-  | 'tool_error' | 'invalid_observation' | 'out_of_scope' | 'unclassified_legacy'
+  | 'tool_error' | 'invalid_observation' | 'out_of_scope'
 export const availabilityIssueText: Record<AvailabilityIssue, string> = {
   predicate_not_met: 'The observed value did not meet the declared condition.',
   missing_observation: 'No observation was supplied.',
@@ -21,12 +21,17 @@ export const availabilityIssueText: Record<AvailabilityIssue, string> = {
   tool_error: 'Evidence collection failed.',
   invalid_observation: 'The observation failed identity or data validation.',
   out_of_scope: 'The observation was outside the declared scope.',
-  unclassified_legacy: 'The exporter did not classify the availability cause.',
+}
+export const availabilityIssueTitle: Record<AvailabilityIssue, string> = {
+  predicate_not_met: 'Predicate not met', missing_observation: 'Missing observation',
+  stale_observation: 'Stale observation', tool_error: 'Collection error',
+  invalid_observation: 'Invalid observation', out_of_scope: 'Out of scope',
 }
 export interface SourceSpan { line: number; column: number; end_line: number; end_column: number }
 export interface ArgumentationDirective {
-  kind: 'strict' | 'rank' | 'contrary'; name: string; other: string | null;
+  kind: 'strict' | 'rank' | 'contrary' | 'prefer'; name: string; other: string | null;
   rank: number | null; review: string; span: SourceSpan | null;
+  source_file?: string | null;
   target_kind: 'evidence' | 'assumption' | 'argument' | 'objection' | 'claim'
 }
 export interface Observation {
@@ -36,7 +41,8 @@ export interface Observation {
 export interface ArgumentOrigin {
   kind: 'evidence' | 'argument' | 'assumption' | 'objection' | 'structural basis' | 'formal rule' | 'formal premise';
   name: string; span?: SourceSpan | null; formal_review?: ArgumentationDirective | null;
-  observation?: Observation | null; rationale?: string; reasoning?: string; meaning?: string
+  observation?: Observation | null; rationale?: string; reasoning?: string; meaning?: string; source_file?: string;
+  scope_transfer?: { source: string; target: string; assumption: string; review: string }
 }
 export interface AspicArgument {
   id: string; conclusion: string; top: 'axiom' | 'ordinary' | 'strict' | 'defeasible';
@@ -49,9 +55,14 @@ export interface AspicDefeat {
   relation_origin?: { objection: string | null; annotation: ArgumentationDirective | null }
 }
 export interface AspicView {
-  schema: 'aspic-view/2'; profile: string; goal: string; goal_claim: string | null;
+  schema: 'aspic-view/3'; profile: string; goal: string; goal_claim: string | null;
   formal_status: FormalStatus; claim_status: ClaimStatus | null; authored_claim_status: ClaimStatus | null;
   source_digest: string | null; snapshot_digest: string | null; theory_digest: string;
+  semantics: 'grounded' | 'preferred' | 'stable';
+  query_mode: 'credulous' | 'sceptical'; query_status: FormalStatus | 'no_extension';
+  preference: 'minimum_rank' | 'last_link_rank' | 'last_link_partial';
+  extensions: string[][]; execution_limits: Record<string, number>;
+  formal_directives: ArgumentationDirective[];
   evaluated_at: string | null;
   validation: { formal_result: 'recomputed'; provenance: 'supplied' };
   arguments: AspicArgument[]; defeats: AspicDefeat[];
@@ -151,6 +162,27 @@ function validateGraph(view: AspicView): void {
   const goalLabels = view.arguments.filter(a => a.conclusion === view.goal).map(a => a.label)
   const status: FormalStatus = goalLabels.includes('in') ? 'accepted' : goalLabels.includes('undecided') ? 'undecided' : goalLabels.length ? 'rejected' : 'unconstructed'
   if (view.formal_status !== status) fail('formal_status', 'does not match the constructed goal arguments')
+  const keys = new Set<string>()
+  for (const extension of view.extensions) {
+    if (extension.some(id => !byId.has(id)) || new Set(extension).size !== extension.length) fail('extensions', 'unknown or duplicate argument')
+    const key = JSON.stringify([...extension].sort())
+    if (keys.has(key)) fail('extensions', 'duplicate extension')
+    keys.add(key)
+    const included = new Set(extension)
+    const attacked = new Set(view.defeats.filter(d => included.has(d.attacker)).map(d => d.target))
+    if (extension.some(id => attacked.has(id))) fail('extensions', 'an extension must be conflict free')
+    if (view.defeats.some(d => included.has(d.target) && !attacked.has(d.attacker))) fail('extensions', 'an extension must defend its arguments')
+    if (view.semantics === 'stable' && view.arguments.some(a => !included.has(a.id) && !attacked.has(a.id))) fail('extensions', 'a stable extension must attack every argument outside it')
+    if (view.semantics === 'grounded' && view.arguments.some(a => (a.label === 'in') !== included.has(a.id))) fail('extensions', 'grounded extension must match grounded labels')
+  }
+  if (view.semantics === 'grounded' && view.extensions.length !== 1) fail('extensions', 'grounded semantics requires one extension')
+  const goalIds = view.arguments.filter(a => a.conclusion === view.goal).map(a => a.id)
+  const acceptance = view.extensions.map(extension => goalIds.some(id => extension.includes(id)))
+  const accepted = view.query_mode === 'credulous' ? acceptance.some(Boolean) : acceptance.every(Boolean)
+  const allRejected = view.extensions.every(extension => goalIds.every(id => view.defeats.some(d => d.target === id && extension.includes(d.attacker))))
+  const queryStatus = !view.extensions.length ? 'no_extension' : !goalIds.length ? 'unconstructed' : accepted ? 'accepted' : allRejected ? 'rejected' : 'undecided'
+  if (queryStatus !== view.query_status) fail('query_status', 'does not match the selected extension query')
+
 }
 
 export function parseAspicView(source: string): AspicView {
@@ -169,6 +201,9 @@ export function validateAspicView(value: unknown): AspicView {
     fail(issue?.instancePath || 'view', `${issue?.message ?? 'invalid export'}${issue?.params ? ` (${JSON.stringify(issue.params)})` : ''}`)
   }
   const view = value as AspicView
+  if (view.arguments.length > MAX_ARGUMENTS) fail('arguments', `exceeds the browser policy of ${MAX_ARGUMENTS}`)
+  if (view.defeats.length > MAX_DEFEATS) fail('defeats', `exceeds the browser policy of ${MAX_DEFEATS}`)
+  if (view.arguments.length > view.execution_limits.formal_arguments! || view.defeats.length > view.execution_limits.formal_defeats!) fail('execution_limits', 'graph exceeds supplied budgets')
   validateGraph(view)
   return view
 }
@@ -236,3 +271,8 @@ export function compareSnapshots(previous: AspicView, current: AspicView): Snaps
   diff.warnings.push('Changes cover argument structure and labels only. Matching uses source names and derivation structure; it does not establish the cause of a change or authenticate either snapshot.')
   return diff
 }
+
+export const evidenceGroups = (view: AspicView) => Object.keys(availabilityIssueText).map(key => {
+  const issue = key as AvailabilityIssue
+  return { issue, description: availabilityIssueText[issue], items: view.unavailable_evidence.filter(item => item.availability_issues.includes(issue)) }
+}).filter(group => group.items.length > 0)

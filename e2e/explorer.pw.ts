@@ -65,6 +65,7 @@ test('renumbered snapshots compare by derivation and restore through events', as
   renumbered.defeats.forEach(d => {
     d.attacker = ids.get(d.attacker)!; d.target = ids.get(d.target)!; d.subargument = ids.get(d.subargument)!
   })
+  renumbered.extensions = renumbered.extensions.map(extension => extension.map(id => ids.get(id)!))
   await importView(page, renumbered, 'renumbered.json')
   await expect(page.locator('.event-card')).toHaveCount(2)
   await expect(page.locator('.event-diff')).toContainText('+0 arguments')
@@ -122,4 +123,38 @@ test('reviewed nested derivations are inspectable and old views cannot replace t
   await expect(page.getByRole('alert')).toContainText('constant')
   await expect(page.locator('.event-card')).toHaveCount(1)
   await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+})
+
+test('failed predicates and absent observations have separate typed panels', async ({page}) => {
+  await page.goto('/')
+  const value=structuredClone(sample)
+  value.unavailable_evidence.push({name:'missing_probe',reasons:['No observation supplied.'],availability_issues:['missing_observation'],span:null})
+  value.unavailable_evidence.push({name:'negative_predicate',reasons:['Observed true, required false.'],availability_issues:['predicate_not_met'],span:null})
+  await importView(page,value,'evidence-outcomes.json')
+  await expect(page.locator('.evidence-group[data-issue="missing_observation"]')).toContainText('missing_probe')
+  await expect(page.locator('.evidence-group[data-issue="predicate_not_met"]')).toContainText('negative_predicate')
+  await expect(page.locator('.evidence-group[data-issue="predicate_not_met"]')).not.toContainText('missing_probe')
+})
+
+test('selected extension labels preserve the grounded graph and restore on snapshot changes', async ({page}) => {
+  await page.goto('/')
+  await page.getByLabel('Graph labelling').selectOption({label:`grounded extension 1 · ${sample.extensions[0]!.length} in`})
+  await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+  await importView(page,sample,'new-snapshot.json')
+  await expect(page.getByLabel('Graph labelling')).toHaveValue('Grounded')
+  await page.getByRole('button',{name:'Snapshot details'}).click()
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('Grounded graph status')
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('sceptical')
+})
+
+test('actual recursive pattern snapshot exposes the reviewed partial priority', async ({page}) => {
+  const scoped=JSON.parse(readFileSync(new URL('../tests/fixtures/scoped-review.json',import.meta.url),'utf8'))
+  await page.goto('/')
+  await importView(page,scoped,'scoped-review.json')
+  await page.getByRole('button',{name:'Snapshot details'}).click()
+  await page.getByText('Reviewed directives · 2').click()
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('prefer release.checks.rest.item')
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('synthetic-review/route-order')
+  await page.getByLabel('Graph labelling').selectOption({label:'preferred extension 1 · 7 in'})
+  await expect(page.locator('.argument-row')).toHaveCount(10)
 })

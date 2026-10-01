@@ -1515,3 +1515,7 @@ main {
   stroke: currentColor;
   stroke-width: 1.2;
 }
+
+.evidence-group { margin-top: 1rem; border-top: 1px solid var(--border, #dce3df); padding-top: .7rem; }
+.evidence-group h5 { margin: 0 0 .6rem; line-height: 1.4; font-size: .8rem; }
+.evidence-group h5 span { float: right; }

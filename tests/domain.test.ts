@@ -3,6 +3,7 @@ import { buildGraph, compareSnapshots, groundedLabels, MAX_FILE_BYTES, MAX_ARGUM
 import type { AspicArgument, AspicDefeat, AspicView, Label } from '../src/domain/aspic'
 import { sampleView } from '../src/domain/sample'
 import schema from '../schema/aspic-view.schema.json'
+import scopedReview from './fixtures/scoped-review.json'
 
 const clone = <T>(x: T): T => structuredClone(x)
 function node(id: string, conclusion: string, children: string[] = []): AspicArgument {
@@ -17,10 +18,14 @@ function view(arguments_: AspicArgument[], defeats: AspicDefeat[] = [], goal = a
   const labels = groundedLabels(arguments_.map(a => a.id), defeats)
   arguments_.forEach(a => { a.subarguments = closure(a); a.label = labels.get(a.id)! })
   const goalLabels = arguments_.filter(a => a.conclusion === goal).map(a => a.label)
-  return { schema: 'aspic-view/2', profile: 'test-profile/1', goal, goal_claim: null,
+  return { ...sampleView, schema: 'aspic-view/3', profile: 'test-profile/1', goal, goal_claim: null,
     formal_status: goalLabels.includes('in') ? 'accepted' : goalLabels.includes('undecided') ? 'undecided' : goalLabels.length ? 'rejected' : 'unconstructed',
     claim_status: null, authored_claim_status: null, source_digest: null, snapshot_digest: null,
     theory_digest: '0'.repeat(64), evaluated_at: null, validation: { formal_result: 'recomputed', provenance: 'supplied' },
+    semantics: 'grounded', query_mode: 'sceptical', preference: 'minimum_rank',
+    query_status: goalLabels.includes('in') ? 'accepted' : goalLabels.includes('undecided') ? 'undecided' : goalLabels.length ? 'rejected' : 'unconstructed',
+    extensions: [arguments_.filter(a => a.label === 'in').map(a => a.id)],
+    execution_limits: {...sampleView.execution_limits, formal_arguments: MAX_ARGUMENTS, formal_defeats: MAX_DEFEATS},
     arguments: arguments_, defeats, unavailable_evidence: [] }
 }
 function diamond(): AspicView {
@@ -35,15 +40,17 @@ function renumber(input: AspicView): AspicView {
     a.subarguments = a.subarguments.map(id => names.get(id)!)
   })
   result.defeats.forEach(d => { d.attacker = names.get(d.attacker)!; d.target = names.get(d.target)!; d.subargument = names.get(d.subargument)! })
+  result.extensions = result.extensions.map(extension => extension.map(id => names.get(id)!))
   result.arguments.reverse()
   return result
 }
 
 describe('versioned import boundary', () => {
   it('keeps runtime limits aligned with the checked-in producer schema', () => {
-    expect(schema.properties.schema.const).toBe('aspic-view/2')
-    expect(schema.properties.arguments.maxItems).toBe(MAX_ARGUMENTS)
-    expect(schema.properties.defeats.maxItems).toBe(MAX_DEFEATS)
+    expect(schema.properties.schema.const).toBe('aspic-view/3')
+    expect(schema.properties.arguments).not.toHaveProperty('maxItems')
+    expect(MAX_ARGUMENTS).toBeGreaterThan(128)
+    expect(schema.properties.defeats).not.toHaveProperty('maxItems')
     expect(schema.additionalProperties).toBe(false)
   })
   it('accepts a real EAL exporter fixture with sources, strict and alternative routes, and a defeat', () => {
@@ -92,13 +99,13 @@ describe('versioned import boundary', () => {
     expect(() => parseAspicView(' '.repeat(MAX_FILE_BYTES + 1))).toThrow('4 MiB')
     expect(() => parseAspicView('😀'.repeat(MAX_FILE_BYTES / 4 + 1))).toThrow('4 MiB')
   })
-  it('rejects more than 128 arguments and 4096 defeat witnesses', () => {
+  it('enforces supplied host budgets and independent browser limits', () => {
     const excess = clone(sampleView)
-    excess.arguments = Array.from({ length: 129 }, () => clone(excess.arguments[0]!))
-    expect(() => validateAspicView(excess)).toThrow('128')
+    excess.arguments = Array.from({ length: MAX_ARGUMENTS + 1 }, () => clone(excess.arguments[0]!))
+    expect(() => validateAspicView(excess)).toThrow(String(MAX_ARGUMENTS))
     const defeats = clone(sampleView)
-    defeats.defeats = Array.from({ length: 4097 }, () => clone(defeats.defeats[0]!))
-    expect(() => validateAspicView(defeats)).toThrow('4096')
+    defeats.defeats = Array.from({ length: MAX_DEFEATS + 1 }, () => clone(defeats.defeats[0]!))
+    expect(() => validateAspicView(defeats)).toThrow()
   })
   it('rejects unknown schema versions, unknown fields, and duplicate argument IDs', () => {
     expect(() => validateAspicView({ ...sampleView, schema: 'aspic-view/99' })).toThrow('schema')
@@ -280,9 +287,53 @@ describe('snapshot identity and change classification', () => {
       previous = pair
     }
     // Avoid the deliberately simple test fixture's recursive closure walk here.
-    const before = { ...view([node('Z', 'placeholder')]), arguments: args, goal: args.at(-1)!.conclusion }
+    const before = { ...view([node('Z', 'placeholder')]), arguments: args, goal: args.at(-1)!.conclusion,
+      extensions: [args.map(a => a.id)] }
     validateAspicView(before)
     const after = validateAspicView(renumber(before))
     expect(compareSnapshots(before, after).unchanged).toHaveLength(127)
+  })
+})
+
+
+describe('extension queries and typed evidence groups', () => {
+  it('imports the actual compound recursive EAL example with reviewed partial priorities', () => {
+    const value = validateAspicView(scopedReview)
+    expect(value.semantics).toBe('preferred'); expect(value.preference).toBe('last_link_partial')
+    expect(value.query_status).toBe('accepted')
+    expect(value.arguments.some(a => a.origin.name === 'release.checks.rest.item')).toBe(true)
+    expect(value.arguments.some(a => a.origin.name === 'release.assess.child')).toBe(true)
+    expect(value.formal_directives.some(d => d.kind === 'prefer')).toBe(true)
+  })
+  const pair = () => {
+    const value = view([node('P', 'p'), node('Q', 'q')], [
+      {attacker:'P',target:'Q',subargument:'Q',kind:'undermine'},
+      {attacker:'Q',target:'P',subargument:'P',kind:'undermine'},
+    ], 'p')
+    value.semantics = 'preferred'; value.query_mode = 'credulous'; value.extensions = [['P'],['Q']]
+    value.query_status = 'accepted'
+    return value
+  }
+  it('keeps grounded labels distinct from credulous and sceptical preferred queries', () => {
+    const value = validateAspicView(pair())
+    expect(value.formal_status).toBe('undecided'); expect(value.query_status).toBe('accepted')
+    expect(() => validateAspicView({...value,query_mode:'sceptical'})).toThrow('query_status')
+    expect(validateAspicView({...value,query_mode:'sceptical',query_status:'undecided'}).query_status).toBe('undecided')
+  })
+  it('rejects conflicting, undefended or false stable extensions', () => {
+    const value = pair()
+    expect(() => validateAspicView({...value,extensions:[['P','Q']]})).toThrow('conflict')
+    expect(() => validateAspicView({...value,semantics:'stable',extensions:[[]]})).toThrow('stable')
+  })
+  it('represents absent stable extensions without vacuous acceptance', () => {
+    const value = view([node('P','p')],[{attacker:'P',target:'P',subargument:'P',kind:'undermine'}],'p')
+    expect(validateAspicView({...value,semantics:'stable',extensions:[],query_status:'no_extension'}).query_status).toBe('no_extension')
+    expect(() => validateAspicView({...value,semantics:'stable',extensions:[],query_status:'accepted'})).toThrow('query_status')
+  })
+  it('allows more than the previous 128 arguments under captured and browser budgets', () => {
+    const value = view(Array.from({length:129},(_,i)=>node(`N${i}`,`p${i}`)))
+    value.execution_limits.formal_arguments = 200
+    expect(validateAspicView(value).arguments).toHaveLength(129)
+    expect(() => validateAspicView({...value,execution_limits:{...value.execution_limits,formal_arguments:128}})).toThrow('budget')
   })
 })

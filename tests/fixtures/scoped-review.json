@@ -1,0 +1,447 @@
+{
+  "schema": "aspic-view/3",
+  "theory_digest": "942c6e9114d29a0bc4aad279adcc11c9e712cb2a4969f531aa42cf4c29011f45",
+  "evaluated_at": "2026-09-30T10:00:30Z",
+  "validation": {
+    "formal_result": "recomputed",
+    "provenance": "supplied"
+  },
+  "profile": "EAL/3-compiled-aspic/5",
+  "goal": "cbd1ec8740e65de9b5aff",
+  "goal_claim": "release.ready",
+  "formal_status": "accepted",
+  "semantics": "preferred",
+  "query_mode": "sceptical",
+  "query_status": "accepted",
+  "preference": "last_link_partial",
+  "extensions": [
+    [
+      "A0",
+      "A1",
+      "A2",
+      "A3",
+      "A5",
+      "A7",
+      "A9"
+    ]
+  ],
+  "execution_limits": {
+    "source_bytes": 1048576,
+    "source_tokens": 100000,
+    "structural_values": 100000,
+    "declarations": 4096,
+    "premise_depth": 128,
+    "expansion_depth": 128,
+    "applications": 1000,
+    "expanded_references": 100000,
+    "expression_nodes": 10000,
+    "expression_depth": 128,
+    "json_depth": 64,
+    "json_nodes": 100000,
+    "record_bytes": 4194304,
+    "collection_evidence": 128,
+    "composed_edges": 131072,
+    "abstract_attacks": 65536,
+    "formal_premises": 64,
+    "formal_rules": 64,
+    "formal_antecedents": 8,
+    "formal_atoms": 128,
+    "formal_contraries": 128,
+    "formal_arguments": 128,
+    "formal_defeats": 4096,
+    "formal_construction": 100000,
+    "extension_search": 100000
+  },
+  "formal_directives": [
+    {
+      "kind": "rank",
+      "name": "release.checks.rest.item",
+      "other": null,
+      "rank": 700,
+      "review": "synthetic-review/right-sensor",
+      "span": {
+        "line": 49,
+        "column": 3,
+        "end_line": 50,
+        "end_column": 1
+      },
+      "source_file": null,
+      "target_kind": "argument"
+    },
+    {
+      "kind": "prefer",
+      "name": "release.checks.rest.item",
+      "other": "release.checks.item",
+      "rank": null,
+      "review": "synthetic-review/route-order",
+      "span": {
+        "line": 50,
+        "column": 3,
+        "end_line": 51,
+        "end_column": 1
+      },
+      "source_file": null,
+      "target_kind": "argument"
+    }
+  ],
+  "claim_status": "supported",
+  "authored_claim_status": "supported",
+  "source_digest": "5c0fb261ac0451d40c4a950defe33fcd4b50f64cc7065d2fe617451da3ec6ceb",
+  "snapshot_digest": "4b5cd9d4b03755791927fdef6dae632d451be00d01b291bc03da22917436c2c3",
+  "arguments": [
+    {
+      "conclusion": "ed9f91166d1ff7836fd49",
+      "direct_subarguments": [],
+      "id": "A0",
+      "label": "in",
+      "rank": 500,
+      "strength": 500,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "release.challenge",
+        "span": {
+          "line": 18,
+          "column": 5,
+          "end_line": 21,
+          "end_column": 6
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "6d320341-4065-420c-92f4-038baf0b168a",
+          "data_digest": "c2a6811d3a98bc03bc034fed50dbe205ef594d68e4c7ab73ce6f4f7c59324d32",
+          "request_digest": "8efd0762411caa41a49e0292b1528670b74cf39366727b2c1c86507339e57b4d",
+          "collected_at": "2026-09-30T10:00:00Z",
+          "tool_binding_digest": "0c6a2ec3b47d658cc3972a6eac9a1e91e3815a702b439699480a7a475cd038ac"
+        }
+      },
+      "display_conclusion": "release.challenge"
+    },
+    {
+      "conclusion": "eb0f0d2f2b38d92be54dc",
+      "direct_subarguments": [],
+      "id": "A1",
+      "label": "in",
+      "rank": 500,
+      "strength": 500,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "release.first",
+        "span": {
+          "line": 10,
+          "column": 5,
+          "end_line": 13,
+          "end_column": 6
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "1245eeeb-35f8-40e3-9549-310455c4fda7",
+          "data_digest": "c2a6811d3a98bc03bc034fed50dbe205ef594d68e4c7ab73ce6f4f7c59324d32",
+          "request_digest": "99528179049a08db103e805c5e9faea9a3fa5dea50e1227e9348041cfc0b31e3",
+          "collected_at": "2026-09-30T10:00:00Z",
+          "tool_binding_digest": "0c6a2ec3b47d658cc3972a6eac9a1e91e3815a702b439699480a7a475cd038ac"
+        }
+      },
+      "display_conclusion": "release.first"
+    },
+    {
+      "conclusion": "e78758403e299cab2e2fd",
+      "direct_subarguments": [],
+      "id": "A2",
+      "label": "in",
+      "rank": 500,
+      "strength": 500,
+      "subarguments": [],
+      "top": "ordinary",
+      "origin": {
+        "kind": "evidence",
+        "name": "release.second",
+        "span": {
+          "line": 14,
+          "column": 5,
+          "end_line": 17,
+          "end_column": 6
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "7a5d258f-3669-4f84-9043-09bb49dc8a67",
+          "data_digest": "c2a6811d3a98bc03bc034fed50dbe205ef594d68e4c7ab73ce6f4f7c59324d32",
+          "request_digest": "f4042cfd4c41c3cdb7f5dc339b8c0cf610ee4d332bce97e7e7d3990985c04d96",
+          "collected_at": "2026-09-30T10:00:00Z",
+          "tool_binding_digest": "0c6a2ec3b47d658cc3972a6eac9a1e91e3815a702b439699480a7a475cd038ac"
+        }
+      },
+      "display_conclusion": "release.second"
+    },
+    {
+      "conclusion": "cc857f335c0a47de50f30",
+      "direct_subarguments": [
+        "A2"
+      ],
+      "id": "A3",
+      "label": "in",
+      "rank": 700,
+      "rule_id": "r0b2007530fde8964d50a",
+      "rule_name": "xc2522960a8e03fd52f2c",
+      "strength": 500,
+      "subarguments": [
+        "A2"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "release.checks.rest.item",
+        "span": {
+          "line": 35,
+          "column": 7,
+          "end_line": 36,
+          "end_column": 1
+        },
+        "formal_review": {
+          "kind": "rank",
+          "name": "release.checks.rest.item",
+          "other": null,
+          "rank": 700,
+          "review": "synthetic-review/right-sensor",
+          "span": {
+            "line": 49,
+            "column": 3,
+            "end_line": 50,
+            "end_column": 1
+          },
+          "source_file": null,
+          "target_kind": "argument"
+        },
+        "rationale": "The authored acceptance checks are relevant to this synthetic criterion.",
+        "reasoning": "release.measured"
+      },
+      "display_conclusion": "release.passed",
+      "authored_statement": "At least one synthetic check supports the reviewed criterion."
+    },
+    {
+      "conclusion": "cc857f335c0a47de50f30",
+      "direct_subarguments": [
+        "A1"
+      ],
+      "id": "A4",
+      "label": "out",
+      "rank": 500,
+      "rule_id": "r7d8ff16403c3779a305e",
+      "rule_name": "xc1e0fff92c13258977c3",
+      "strength": 500,
+      "subarguments": [
+        "A1"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "release.checks.item",
+        "span": {
+          "line": 35,
+          "column": 7,
+          "end_line": 36,
+          "end_column": 1
+        },
+        "formal_review": null,
+        "rationale": "The authored acceptance checks are relevant to this synthetic criterion.",
+        "reasoning": "release.measured"
+      },
+      "display_conclusion": "release.passed",
+      "authored_statement": "At least one synthetic check supports the reviewed criterion."
+    },
+    {
+      "conclusion": "c616ff55c1b2fdf31ef32",
+      "direct_subarguments": [
+        "A3"
+      ],
+      "id": "A5",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "re48f13445bd8da558f8b",
+      "rule_name": "x26daeda21cb726542c69",
+      "strength": 500,
+      "subarguments": [
+        "A2",
+        "A3"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "release.assess.child",
+        "span": {
+          "line": 45,
+          "column": 5,
+          "end_line": 46,
+          "end_column": 1
+        },
+        "formal_review": null,
+        "rationale": "The authored acceptance checks are relevant to this synthetic criterion.",
+        "reasoning": "release.measured"
+      },
+      "display_conclusion": "release.assess.intermediate",
+      "authored_statement": "The synthetic criterion has an accepted supporting route."
+    },
+    {
+      "conclusion": "c616ff55c1b2fdf31ef32",
+      "direct_subarguments": [
+        "A4"
+      ],
+      "id": "A6",
+      "label": "out",
+      "rank": 500,
+      "rule_id": "re48f13445bd8da558f8b",
+      "rule_name": "x26daeda21cb726542c69",
+      "strength": 500,
+      "subarguments": [
+        "A1",
+        "A4"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "release.assess.child",
+        "span": {
+          "line": 45,
+          "column": 5,
+          "end_line": 46,
+          "end_column": 1
+        },
+        "formal_review": null,
+        "rationale": "The authored acceptance checks are relevant to this synthetic criterion.",
+        "reasoning": "release.measured"
+      },
+      "display_conclusion": "release.assess.intermediate",
+      "authored_statement": "The synthetic criterion has an accepted supporting route."
+    },
+    {
+      "conclusion": "cbd1ec8740e65de9b5aff",
+      "direct_subarguments": [
+        "A5"
+      ],
+      "id": "A7",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "rb352c3c43a2fc1f1267a",
+      "rule_name": "x3741ddf4efdeb097c14d",
+      "strength": 500,
+      "subarguments": [
+        "A2",
+        "A3",
+        "A5"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "release.assess",
+        "span": {
+          "line": 40,
+          "column": 3,
+          "end_line": 47,
+          "end_column": 4
+        },
+        "formal_review": null,
+        "rationale": "The authored acceptance checks are relevant to this synthetic criterion.",
+        "reasoning": "release.measured"
+      },
+      "display_conclusion": "release.ready",
+      "authored_statement": "The synthetic release has an accepted reviewed route."
+    },
+    {
+      "conclusion": "cbd1ec8740e65de9b5aff",
+      "direct_subarguments": [
+        "A6"
+      ],
+      "id": "A8",
+      "label": "out",
+      "rank": 500,
+      "rule_id": "rb352c3c43a2fc1f1267a",
+      "rule_name": "x3741ddf4efdeb097c14d",
+      "strength": 500,
+      "subarguments": [
+        "A1",
+        "A4",
+        "A6"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "argument",
+        "name": "release.assess",
+        "span": {
+          "line": 40,
+          "column": 3,
+          "end_line": 47,
+          "end_column": 4
+        },
+        "formal_review": null,
+        "rationale": "The authored acceptance checks are relevant to this synthetic criterion.",
+        "reasoning": "release.measured"
+      },
+      "display_conclusion": "release.ready",
+      "authored_statement": "The synthetic release has an accepted reviewed route."
+    },
+    {
+      "conclusion": "odff101b27b9e9ba5d3cb",
+      "direct_subarguments": [
+        "A0"
+      ],
+      "id": "A9",
+      "label": "in",
+      "rank": 500,
+      "rule_id": "jdff101b27b9e9ba5d3cb",
+      "rule_name": "x207b43d006bfd4d90ed1",
+      "strength": 500,
+      "subarguments": [
+        "A0"
+      ],
+      "top": "defeasible",
+      "origin": {
+        "kind": "objection",
+        "name": "release.disputed",
+        "span": {
+          "line": 48,
+          "column": 3,
+          "end_line": 49,
+          "end_column": 1
+        },
+        "formal_review": null
+      },
+      "display_conclusion": "release.disputed"
+    }
+  ],
+  "defeats": [
+    {
+      "attacker": "A9",
+      "kind": "undercut",
+      "subargument": "A4",
+      "target": "A4",
+      "relation_origin": {
+        "objection": "release.disputed",
+        "annotation": null
+      }
+    },
+    {
+      "attacker": "A9",
+      "kind": "undercut",
+      "subargument": "A4",
+      "target": "A6",
+      "relation_origin": {
+        "objection": "release.disputed",
+        "annotation": null
+      }
+    },
+    {
+      "attacker": "A9",
+      "kind": "undercut",
+      "subargument": "A4",
+      "target": "A8",
+      "relation_origin": {
+        "objection": "release.disputed",
+        "annotation": null
+      }
+    }
+  ],
+  "unavailable_evidence": []
+}

@@ -48,14 +48,21 @@ const importError = ref("");
 const importing = ref(false);
 const announcement = ref("Engineering example loaded.");
 const sourcePanel = ref(false);
-const graphData = computed(() => buildGraph(view.value));
+const selectedExtension = ref<number | null>(null);
+const displayView = computed(() => {
+  if (selectedExtension.value === null) return view.value;
+  const extension = new Set(view.value.extensions[selectedExtension.value] ?? []);
+  const attacked = new Set(view.value.defeats.filter(d => extension.has(d.attacker)).map(d => d.target));
+  return {...view.value, arguments: view.value.arguments.map(a => ({...a, label: extension.has(a.id) ? 'in' as const : attacked.has(a.id) ? 'out' as const : 'undecided' as const}))};
+});
+const graphData = computed(() => buildGraph(displayView.value));
 const counts = computed(() => ({
-  in: view.value.arguments.filter((a) => a.label === "in").length,
-  out: view.value.arguments.filter((a) => a.label === "out").length,
-  undecided: view.value.arguments.filter((a) => a.label === "undecided").length,
+  in: displayView.value.arguments.filter((a) => a.label === "in").length,
+  out: displayView.value.arguments.filter((a) => a.label === "out").length,
+  undecided: displayView.value.arguments.filter((a) => a.label === "undecided").length,
 }));
 const filteredArguments = computed(() =>
-  view.value.arguments.filter((a) =>
+  displayView.value.arguments.filter((a) =>
     `${a.id} ${a.display_conclusion} ${a.authored_statement ?? ""} ${a.origin.name} ${a.label}`
       .toLowerCase()
       .includes(query.value.toLowerCase()),
@@ -72,7 +79,10 @@ const sourceSummary = computed(() => [
   ["Profile", view.value.profile],
   ["Goal atom", view.value.goal],
   ["Authored EAL status", view.value.authored_claim_status ?? "Not supplied"],
-  ["Formal status", view.value.formal_status],
+  ["Grounded graph status", view.value.formal_status],
+  ["Selected query", `${view.value.semantics} / ${view.value.query_mode}: ${view.value.query_status}`],
+  ["Preference", view.value.preference],
+  ["Extensions", String(view.value.extensions.length)],
   ["Evaluation time", view.value.evaluated_at ?? "Not supplied"],
   ["Source digest", view.value.source_digest ?? "Not supplied"],
   ["Theory digest", view.value.theory_digest],
@@ -98,6 +108,7 @@ function selectEdge(id: string) {
     "Selected relation. Its exact target is shown in the details panel.";
 }
 function restoreEvent(id: number) {
+  selectedExtension.value = null;
   activeEvent.value = id;
   query.value = "";
   selectedEdge.value = null;
@@ -227,10 +238,13 @@ function downloadSample() {
         <div class="goal-summary">
           <span class="eyebrow">Current goal</span>
           <h2>{{ view.goal_claim || view.goal }}</h2>
-          <span class="goal-result" :class="view.formal_status">{{
-            view.formal_status
+          <span class="goal-result" :class="view.query_status">{{
+            view.query_status
           }}</span>
         </div>
+        <label class="extension-label">Graph labels
+          <select v-model="selectedExtension" aria-label="Graph labelling"><option :value="null">Grounded</option><option v-for="(extension,index) in view.extensions" :key="index" :value="index">{{ view.semantics }} extension {{ index + 1 }} · {{ extension.length }} in</option></select>
+        </label>
         <div class="stats" aria-label="Argument labels">
           <span
             ><b>{{ view.arguments.length }}</b> arguments</span
@@ -263,6 +277,16 @@ function downloadSample() {
             <dd>{{ value }}</dd></template
           >
         </dl>
+        <details v-if="view.formal_directives.length" class="reviewed-directives">
+          <summary>Reviewed directives · {{ view.formal_directives.length }}</summary>
+          <ul>
+            <li v-for="(directive,index) in view.formal_directives" :key="index">
+              <code>{{ directive.kind }} {{ directive.name }}{{ directive.other ? ` → ${directive.other}` : '' }}{{ directive.rank !== null ? ` ${directive.rank}` : '' }}</code>
+              <span> · {{ directive.review }}</span>
+              <span v-if="directive.source_file"> · {{ directive.source_file }}</span>
+            </li>
+          </ul>
+        </details>
         <p>
           Provenance and review references are supplied metadata; this viewer
           does not authenticate them. The optional theory editor delegates
@@ -401,7 +425,7 @@ function downloadSample() {
           <div class="graph-stage">
             <ArgumentGraph
               ref="graph"
-              :view="view"
+              :view="displayView"
               :selected-argument="selectedArgument"
               :selected-edge="selectedEdge"
               :show-support="showSupport"
@@ -463,7 +487,7 @@ function downloadSample() {
         </section>
 
         <ArgumentInspector
-          :view="view"
+          :view="displayView"
           :graph-data="graphData"
           :selected-argument="selectedArgument"
           :selected-edge="selectedEdge"
@@ -480,7 +504,7 @@ function downloadSample() {
       />
       <footer class="app-footer">
         <span
-          >ASPIC+ VIEW / 2 <span aria-hidden="true">·</span> Imported files stay in
+          >ASPIC+ VIEW / 3 <span aria-hidden="true">·</span> Imported files stay in
           this browser. <template v-if="solverEnabled">Edited theories use the local EAL solver.</template></span
         ><span
           >Snapshot events record imports and evaluations, not the order in which reasoning

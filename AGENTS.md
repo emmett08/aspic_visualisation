@@ -2,9 +2,9 @@
 
 This repository owns the Vue/TypeScript ASPIC+ inspection app. EAL owns source parsing, observation checks, theory compilation and formal argument construction. Keep that boundary explicit; introduce a live solver or collector only for an authorised requirement with a tested contract.
 
-Use the versioned `aspic-view/2` export contract. Preserve direct derivation edges, distinct defeat witnesses and the exact attacked subargument. Reused evidence is shared by identity. Derivation cycles are invalid; defeat cycles can be valid. An absent observation is not evidence of a false objection.
+Use the versioned `aspic-view/3` export contract. Preserve direct derivation edges, distinct defeat witnesses and the exact attacked subargument. Reused evidence is shared by identity. Derivation cycles are invalid; defeat cycles can be valid. An absent observation is not evidence of a false objection.
 
-Imported validation and provenance fields are supplied assertions. Do not label an imported graph authenticated, or claim the browser has reconstructed the full formal theory. Keep grounded labels separate from EAL claim status and source prose.
+Imported validation and provenance fields are supplied assertions. Do not label an imported graph authenticated, or claim the browser has reconstructed the full formal theory. Keep grounded graph labels, selected extension queries and EAL claim status separate. Keep grounded labels separate from EAL claim status and source prose.
 
 Use a single graph with accessible text/list controls. Session import events are not observation chronology. Compare structural argument identities across snapshots rather than local solver IDs.
 

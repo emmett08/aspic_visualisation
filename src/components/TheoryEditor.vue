@@ -40,7 +40,7 @@ async function build() {
     }
     const view = parseAspicView(text)
     emit('solved', { view, title: `Theory: ${theory.goal}` })
-    status.value = `Graph built: ${view.arguments.length} arguments; goal ${view.formal_status}.`
+    status.value = `Graph built: ${view.arguments.length} arguments; goal ${view.query_status}.`
   } catch (cause) {
     error.value = cause instanceof Error && cause.name === 'AbortError'
       ? 'The theory service did not respond within 20 seconds. Try a smaller theory.'
@@ -57,7 +57,7 @@ async function build() {
     <summary><span>Build an ASPIC+ argument graph</span><span class="theory-subtitle">Explicit premises, rules and objections</span></summary>
     <form class="theory-form" :aria-busy="submitting" @submit.prevent="build">
       <div class="theory-intro">
-        <p>One entry per line. This uses EAL’s bounded ASPIC+ profile: acyclic rules and grounded semantics. <span v-if="enabled">Your theory is sent to this site’s solver when you build.</span><span v-else>Start the optional EAL solver to build edited theories.</span></p>
+        <p>One entry per line. This uses EAL’s bounded ASPIC+ profile: finite premise-founded derivations and explicit acceptance semantics. <span v-if="enabled">Your theory is sent to this site’s solver when you build.</span><span v-else>Start the optional EAL solver to build edited theories.</span></p>
         <button type="button" class="theory-demo" :disabled="submitting" @click="loadDemo">Load engineering demo</button>
       </div>
       <div class="theory-fields">
@@ -87,9 +87,15 @@ async function build() {
           <small id="defeasible-hint">id: p, q ⇒ r, optionally @ rank. Undercut d1 by targeting applicable_d1.</small>
         </label>
       </div>
+      <div class="assessment-fields">
+        <label>Acceptance<select v-model="fields.semantics" aria-label="Acceptance semantics"><option value="grounded">Grounded</option><option value="preferred">Preferred extensions</option><option value="stable">Stable extensions</option></select></label>
+        <label>Query<select v-model="fields.queryMode" aria-label="Query mode"><option value="sceptical">In every extension</option><option value="credulous">In at least one extension</option></select></label>
+        <label>Preference<select v-model="fields.preference" aria-label="Preference ordering"><option value="minimum_rank">Lowest rank in the derivation</option><option value="last_link_rank">Last defeasible rule ranks</option><option value="last_link_partial">Declared last-link priorities</option></select></label>
+        <label v-if="fields.preference === 'last_link_partial'">Priorities<textarea v-model="fields.priorities" aria-label="Priorities" placeholder="rule d3 > d1&#10;premise inspection_ok > test_pass" /></label>
+      </div>
       <div class="theory-footer">
         <label class="theory-goal" for="theory-goal">Goal<input id="theory-goal" v-model="fields.goal" placeholder="pump_ready" spellcheck="false" :disabled="submitting" /></label>
-        <p>Ranks 0–1000; default 500. Strength is the weakest fallible link. Up to 64 premises, 64 rules and 128 constructed arguments.</p>
+        <p>Ranks 0–1000; default 500. The selected preference controls defeat. Processor budgets bound construction and extension search.</p>
         <button class="theory-build" type="submit" :disabled="submitting || !enabled">{{ submitting ? 'Building graph…' : 'Build graph' }}</button>
       </div>
       <p v-if="error" class="theory-error" role="alert">{{ error }}</p>
@@ -134,4 +140,10 @@ button:disabled { opacity: .6; cursor: not-allowed; }
   .theory-goal { width: 100%; }
   .theory-footer p { flex-basis: 100%; }
 }
+</style>
+
+<style scoped>
+.assessment-fields { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+.assessment-fields label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.assessment-fields select, .assessment-fields textarea { padding: 8px; border: 1px solid #cbd7cf; border-radius: 6px; background: #fbfcfb; }
 </style>

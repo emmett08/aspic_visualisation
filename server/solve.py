@@ -8,10 +8,11 @@ from __future__ import annotations
 
 import json
 import sys
+import os
 
-EAL_REVISION = "1a8d0df83051f264b3c843686f2a5d52029e7ecc"
-EXPECTED_IMPLEMENTATION = "eal-aspic-grounded-4"
-EXPECTED_PACKAGE = "3.0.0"
+EAL_REVISION = "8229fa711868a88f9354a2b3f7b1b08bf7e3f769"
+EXPECTED_IMPLEMENTATION = "eal-aspic-finite-5"
+EXPECTED_PACKAGE = "3.1.0"
 MAX_REQUEST_BYTES = 64 * 1024
 
 
@@ -43,14 +44,17 @@ def solve_request(raw: bytes) -> dict:
     if (__version__ != EXPECTED_PACKAGE or
             ASPIC_CONTRACT.implementation_version != EXPECTED_IMPLEMENTATION):
         raise RuntimeError("Install the reviewed EAL revision " + EAL_REVISION)
-    computation = execute_extension(ASPIC_CONTRACT, payload)
+    from eal.limits import ExecutionLimits, using_limits
+    limits = ExecutionLimits.load(os.environ['EAL_LIMITS_FILE']) if os.environ.get('EAL_LIMITS_FILE') else ExecutionLimits()
+    with using_limits(limits):
+        computation = execute_extension(ASPIC_CONTRACT, payload)
     if computation["status"] != "supported":
-        raise ValueError("; ".join(computation["reasons"]))
+        raise ValueError(("Assessment incomplete: " if computation["status"] == "incomplete" else "") + "; ".join(computation["reasons"]))
     return export_aspic_view({
         "theory": payload["theory"],
         "formal": computation["details"],
         "profile": ASPIC_CONTRACT.identifier,
-    })
+    }, limits=limits)
 
 
 def main() -> int:

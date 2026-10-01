@@ -1,3 +1,5 @@
+Historical verification of package 3.0.0 and `aspic-view/2`. Current verification is in [the EAL 3.1 record](verification-eal31.md).
+
 # EAL/3 browser verification
 
 The maintained sample was regenerated using the EAL/3 compiler and exporter:

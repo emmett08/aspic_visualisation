@@ -1,19 +1,111 @@
 {
-  "schema": "aspic-view/2",
+  "schema": "aspic-view/3",
   "theory_digest": "2bd2a124b9e4c3bf8319862706969b2d5ebe47bd5d6e75d50758577f2024271e",
   "evaluated_at": "2026-09-25T10:00:30Z",
   "validation": {
     "formal_result": "recomputed",
     "provenance": "supplied"
   },
-  "profile": "EAL/3-compiled-aspic/4",
+  "profile": "EAL/3-compiled-aspic/5",
   "goal": "c7d0843fae823cf542bd6",
   "goal_claim": "run_passes",
   "formal_status": "accepted",
+  "semantics": "grounded",
+  "query_mode": "sceptical",
+  "query_status": "accepted",
+  "preference": "minimum_rank",
+  "extensions": [
+    [
+      "A0",
+      "A1",
+      "A2",
+      "A3",
+      "A4",
+      "A5",
+      "A6",
+      "A7",
+      "A8",
+      "A10"
+    ]
+  ],
+  "execution_limits": {
+    "source_bytes": 1048576,
+    "source_tokens": 100000,
+    "structural_values": 100000,
+    "declarations": 4096,
+    "premise_depth": 128,
+    "expansion_depth": 128,
+    "applications": 1000,
+    "expanded_references": 100000,
+    "expression_nodes": 10000,
+    "expression_depth": 128,
+    "json_depth": 64,
+    "json_nodes": 100000,
+    "record_bytes": 4194304,
+    "collection_evidence": 128,
+    "composed_edges": 131072,
+    "abstract_attacks": 65536,
+    "formal_premises": 64,
+    "formal_rules": 64,
+    "formal_antecedents": 8,
+    "formal_atoms": 128,
+    "formal_contraries": 128,
+    "formal_arguments": 128,
+    "formal_defeats": 4096,
+    "formal_construction": 100000,
+    "extension_search": 100000
+  },
+  "formal_directives": [
+    {
+      "kind": "strict",
+      "name": "report_arg",
+      "other": null,
+      "rank": null,
+      "review": "synthetic-review/checked-record-implication",
+      "span": {
+        "line": 80,
+        "column": 3,
+        "end_line": 82,
+        "end_column": 1
+      },
+      "source_file": null,
+      "target_kind": "argument"
+    },
+    {
+      "kind": "rank",
+      "name": "independent_probe",
+      "other": null,
+      "rank": 700,
+      "review": "synthetic-review/independent-probe",
+      "span": {
+        "line": 82,
+        "column": 3,
+        "end_line": 84,
+        "end_column": 1
+      },
+      "source_file": null,
+      "target_kind": "argument"
+    },
+    {
+      "kind": "rank",
+      "name": "probe_record",
+      "other": null,
+      "rank": 700,
+      "review": "synthetic-review/probe-observation",
+      "span": {
+        "line": 84,
+        "column": 3,
+        "end_line": 85,
+        "end_column": 1
+      },
+      "source_file": null,
+      "target_kind": "evidence"
+    }
+  ],
   "claim_status": "supported",
   "authored_claim_status": "supported",
   "source_digest": "d03429acf2c1fb32971b67fe290c167869e9ebe618b6c71a614a9c0846047411",
-  "snapshot_digest": "bd8b0bed870a36cc8b2ef382f482479d581c255370a1431472203ce5c6236057",
+  "snapshot_digest": "c94515d927994be40fdca8bf6abbe70a82a048b26a0e91f881da47d1ddfe392b",
   "arguments": [
     {
       "conclusion": "ef041a8271909948b0680",
@@ -35,11 +127,11 @@
         },
         "formal_review": null,
         "observation": {
-          "run_id": "b88f7011-9aa0-4ee6-b4f6-272bece0319c",
+          "run_id": "8e3680c9-6c52-4e3e-afc1-31341a23a704",
           "data_digest": "22d5961de159f5aa84b2ca796d00460e0d516f6c3756278323b5cdc3678933cd",
           "request_digest": "0238e7ded4d0c030106e8509272687e1af60188a46ec27dc7886ac202617c8af",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
+          "tool_binding_digest": "ec4ad09c8165c2399370dbf29ac10ccd8f68e0a353a55550a106bd93a42b824e"
         }
       },
       "display_conclusion": "checked_record"
@@ -64,11 +156,11 @@
         },
         "formal_review": null,
         "observation": {
-          "run_id": "f6a2a31a-4077-429a-aec2-f5b6cc4bc5de",
+          "run_id": "3e89b7c5-90e7-476a-be61-dc83ccdaae7c",
           "data_digest": "08211cdf62af82b8652d35acab2a6a7b17f003694613e7b61a9f9e3d6e1b73ed",
           "request_digest": "e08ba75764af5d98cc3b96d5c92c66fc6d8c6921ec55472dd1a1d243961a4187",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
+          "tool_binding_digest": "ec4ad09c8165c2399370dbf29ac10ccd8f68e0a353a55550a106bd93a42b824e"
         }
       },
       "display_conclusion": "gap_record"
@@ -93,11 +185,11 @@
         },
         "formal_review": null,
         "observation": {
-          "run_id": "8074d026-8371-4eff-b0ec-78ba52eba00f",
+          "run_id": "ce8bdce2-9f61-4901-8888-7a61dca26293",
           "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
           "request_digest": "3236a96d7a4f74c6c652524ec619cf50ef1a16b077c302c9ec4c0138fea449df",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
+          "tool_binding_digest": "ec4ad09c8165c2399370dbf29ac10ccd8f68e0a353a55550a106bd93a42b824e"
         }
       },
       "display_conclusion": "latency_record"
@@ -132,14 +224,15 @@
             "end_line": 85,
             "end_column": 1
           },
+          "source_file": null,
           "target_kind": "evidence"
         },
         "observation": {
-          "run_id": "18309033-197f-4352-8e8a-bd7e7ef25001",
+          "run_id": "bd093c95-8943-4aab-8a02-179497ebca00",
           "data_digest": "99cec1e8cb7baf0017ba1215335247beb5c87dde227063f3066d60e9e9e059f0",
           "request_digest": "f7a46d318c7a7d49fc04bd8508d5c9fda84d44cd89c42e0a7cb4ebaba188fc8f",
           "collected_at": "2026-09-25T10:00:00Z",
-          "tool_binding_digest": "e6d48568613f44de6810fd0658988484b6fe31a0da85abfa7216d1293f317354"
+          "tool_binding_digest": "ec4ad09c8165c2399370dbf29ac10ccd8f68e0a353a55550a106bd93a42b824e"
         }
       },
       "display_conclusion": "probe_record"
@@ -271,6 +364,7 @@
             "end_line": 82,
             "end_column": 1
           },
+          "source_file": null,
           "target_kind": "argument"
         },
         "rationale": "The stipulated finding concerns only the identified synthetic run.",
@@ -316,6 +410,7 @@
             "end_line": 84,
             "end_column": 1
           },
+          "source_file": null,
           "target_kind": "argument"
         },
         "rationale": "The stipulated finding concerns only the identified synthetic run.",

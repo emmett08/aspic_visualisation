@@ -5,9 +5,9 @@
 | Layer | Responsibility |
 |---|---|
 | EAL parser and authored evaluator | Resolve EAL declarations, check observations and local methods; remain the default assessment |
-| Opt-in EAL compiler and ASPIC+ method | Construct the bounded formal theory and compute arguments, defeats and grounded labels |
-| EAL JSON exporter | Recompute the formal result, require exact equality, project origins and emit `aspic-view/2` |
-| TypeScript domain layer | Check imported graph structure and grounded labelling, construct presentation elements and compare snapshots |
+| Opt-in EAL compiler and ASPIC+ method | Construct the bounded formal theory and compute finite arguments, defeats, selected extensions and query status |
+| EAL JSON exporter | Recompute the formal result, require exact equality, project origins and emit `aspic-view/3` |
+| TypeScript domain layer | Check graph structure, grounded labelling, supplied extension validity and query consistency, construct presentation elements and compare snapshots |
 | Vue components | Local file import, selection, source inspection, filters and session history |
 | Cytoscape.js | Render a single graph, pan/zoom, selection events and image export |
 
@@ -38,3 +38,11 @@ Retaining an embedded Python HTML renderer would couple packaging and UI changes
 Cytoscape.js supplies graph rendering and interaction. Vue single-file components use TypeScript's Composition API; `vue-tsc` checks types independently because Vite transpilation alone does not type-check. Primary documentation: [Vue TypeScript](https://vuejs.org/guide/typescript/overview), [Cytoscape.js](https://js.cytoscape.org/).
 
 Human comprehension, bias mitigation, deskilling, technical debt and inference cost require separate engineering studies. A working graph and passing tests establish none of those effects.
+
+## Extension inspection and evidence groups
+
+The canonical snapshot preserves grounded labels and selected query metadata. Choosing an extension computes presentation labels from that supplied set and its outgoing defeats; imports and event restoration reset the selection. Exported snapshots remain unchanged. Minimum numerical `strength` remains a descriptive field when a last-link preference is active.
+
+Availability groups use typed causes, never reason-text inference. Missing observations, failed predicates, stale observations, collection errors, invalid observations and scope mismatches remain distinct. One record may occur in multiple groups when it carries multiple supplied issues; grouping adds no premise. Source-file and conditional transfer metadata are displayed as supplied records.
+
+Captured execution limits constrain imported graph counts alongside browser policy. Preferred-family completeness and exporter provenance remain supplied assertions; the browser contains no extension enumerator or argument constructor. The optional local bridge delegates these calculations to `argumentation/aspic/2`, implementation `eal-aspic-finite-5`, package 3.1.0.

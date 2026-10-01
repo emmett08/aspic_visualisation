@@ -55,10 +55,10 @@ describe('explicit theory input notation', () => {
   })
 
   it('bounds total premises, rules and rule antecedents', () => {
-    expect(() => parse({ axioms: '', premises: '' })).toThrow('between 1 and 64')
-    expect(() => parse({ axioms: '', premises: Array.from({ length: 65 }, (_, i) => `p${i}`).join('\n') })).toThrow('between 1 and 64')
-    expect(() => parse({ strictRules: Array.from({ length: 65 }, (_, i) => `s${i}: p -> q`).join('\n'), defeasibleRules: '' })).toThrow('at most 64 rules')
-    expect(() => parse({ strictRules: 's1: a, b, c, d, e, f, g, h, i -> q' })).toThrow('at most 8 antecedents')
+    expect(() => parse({ axioms: '', premises: '' })).toThrow('between 1 and 4096')
+    expect(() => parse({ axioms: '', premises: Array.from({ length: 4097 }, (_, i) => `p${i}`).join('\n') })).toThrow('between 1 and 4096')
+    expect(() => parse({ strictRules: Array.from({ length: 4097 }, (_, i) => `s${i}: p -> q`).join('\n'), defeasibleRules: '' })).toThrow('at most 4096 rules')
+    expect(() => parse({ strictRules: `s1: ${Array.from({length:129},(_,i)=>`p${i}`).join(', ')} -> q` })).toThrow('at most 128 antecedents')
   })
 
   it('reserves enough identifier length for generated applicability names', () => {
@@ -69,4 +69,11 @@ describe('explicit theory input notation', () => {
   it('bounds the input before parsing', () => {
     expect(() => parse({ premises: ' '.repeat(65_537) })).toThrow('64 KiB')
   })
+})
+
+it('encodes explicit extension queries and typed partial priorities', () => {
+  const theory = parseTheoryFields({...engineeringDemo, semantics:'preferred',queryMode:'credulous',preference:'last_link_partial',priorities:'rule d3 > d1'})
+  expect(theory.options).toEqual({semantics:'preferred',query_mode:'credulous',preference:'last_link_partial'})
+  expect(theory.priorities).toEqual([{kind:'rule',higher:'d3',lower:'d1'}])
+  expect(()=>parseTheoryFields({...engineeringDemo,priorities:'rule d3 > d1'})).toThrow('partial')
 })
