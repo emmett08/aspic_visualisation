@@ -37,6 +37,7 @@ Enter one element per line:
 | Ordinary premises | `inspection_ok @ 700` | Fallible premise with a global rank |
 | Strict rules | `s1: voltage_ok -> power_ok` | Strict inference |
 | Defeasible rules | `d1: test_pass, power_ok => pump_ready @ 500` | Defeasible inference, named `applicable_d1` for undercuts |
+| Named defeasible rules | `d1 [use_primary]: test_pass => pump_ready @ 500` | Explicit positive applicability atom `use_primary`; an undercut targets that atom |
 | Contraries | `unreliable_test -> applicable_d1` | Directed contrary; add the reverse line explicitly for a reciprocal pair |
 | Goal | `pump_ready` | Atom queried under the selected extension semantics |
 
@@ -98,6 +99,16 @@ The bundled engineering snapshot is generated from EAL/3 source by the companion
 compiler, including a typed pattern instance, nested premise derivations and reviewed
 ASPIC+ annotations. [Cloud browser verification and screenshots](docs/verification-eal31.md)
 record an actual local import of this sample.
+
+The companion `examples/aspic-keywords` example also supplies full source-directive
+and explicit-theory exports. [Reproducible fixtures](tests/fixtures/README.md) cover
+all four reviewed directive kinds, all three defeat kinds, negative literals and
+two preferred extensions. Explicit applicability names in the theory editor
+preserve the same undercut targets when rebuilding that example.
+
+[Cloud-browser captures and verification](docs/verification-aspic-keywords.md) show
+the exact theory rebuilt through the live solver, both preferred extensions and
+all reviewed source directives.
 
 The optional bridge accepts an operator-owned budget file through `EAL_LIMITS_FILE=/absolute/path/limits.toml`. Its `[limits]` table can raise solver construction or extension-search budgets; browser requests cannot change it. Solver exhaustion reports an incomplete calculation and preserves the current graph. Request bytes, worker deadline and HTTP deadline remain separately bounded.
 

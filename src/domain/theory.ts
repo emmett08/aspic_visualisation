@@ -90,24 +90,33 @@ export function parseTheoryFields(fields: TheoryFields): ExplicitTheory {
   if (!theory.premises.length || theory.premises.length > 4096) invalid('Premises', 'provide between 1 and 4096 axioms and ordinary premises in total')
 
   const ruleIds = new Set<string>()
+  const ruleNames = new Set<string>()
   for (const kind of ['strict', 'defeasible'] as const) {
     for (const line of lines(kind === 'strict' ? fields.strictRules : fields.defeasibleRules, kind === 'strict' ? 'Strict rules' : 'Defeasible rules')) {
       const parsed = kind === 'defeasible' ? ranked(line.text, line.where) : { text: line.text, rank: 500 }
-      const match = /^(\S+)\s*:\s*(.*?)\s*(->|=>)\s*(\S+)\s*$/.exec(parsed.text)
-      if (!match || match[3] !== (kind === 'strict' ? '->' : '=>')) {
-        invalid(line.where, `use ${kind === 'strict' ? 's1: p, q -> r' : 'd1: p, q => r [@ rank]'}`)
+      const match = /^(\S+)(?:\s+\[([^\]]*)\])?\s*:\s*(.*?)\s*(->|=>)\s*(\S+)\s*$/.exec(parsed.text)
+      if (!match || match[4] !== (kind === 'strict' ? '->' : '=>')) {
+        invalid(line.where, `use ${kind === 'strict' ? 's1: p, q -> r' : 'd1 [applicability_name]: p, q => r [@ rank]; the bracketed name is optional'}`)
       }
       const id = match[1]!
       if (!identifier.test(id)) invalid(line.where, 'rule ID must be a positive atom of at most 64 characters')
-      if (kind === 'defeasible' && id.length > 53) invalid(line.where, 'defeasible rule ID may have at most 53 characters to allow its applicable_ name')
+      const explicitName = match[2]?.trim()
+      if (kind === 'strict' && explicitName !== undefined) invalid(line.where, 'a strict rule has no defeasible applicability name')
+      if (kind === 'defeasible' && explicitName === undefined && id.length > 53) invalid(line.where, 'defeasible rule ID may have at most 53 characters to allow its applicable_ name; supply an explicit name for longer IDs')
+      const name = explicitName ?? `applicable_${id}`
+      if (kind === 'defeasible') {
+        if (!identifier.test(name)) invalid(line.where, 'applicability name must be a positive atom of at most 64 characters')
+        if (ruleNames.has(name)) invalid(line.where, `duplicate applicability name ${name}`)
+        ruleNames.add(name)
+      }
       if (ruleIds.has(id)) invalid(line.where, `duplicate rule ID ${id}`)
       ruleIds.add(id)
-      const antecedents = match[2]!.split(',').map(part => atom(part, line.where))
+      const antecedents = match[3]!.split(',').map(part => atom(part, line.where))
       if (antecedents.length > 128) invalid(line.where, 'a rule may have at most 128 antecedents')
       if (new Set(antecedents).size !== antecedents.length) invalid(line.where, 'a rule cannot repeat an antecedent')
-      const consequent = atom(match[4]!, line.where)
+      const consequent = atom(match[5]!, line.where)
       theory.rules.push(kind === 'strict' ? { id, kind, antecedents, consequent } :
-        { id, kind, antecedents, consequent, name: `applicable_${id}`, rank: parsed.rank })
+        { id, kind, antecedents, consequent, name, rank: parsed.rank })
     }
   }
   if (theory.rules.length > 4096) invalid('Rules', 'provide at most 4096 rules in total')

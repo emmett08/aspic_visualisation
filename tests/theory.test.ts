@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { engineeringDemo, parseTheoryFields, type TheoryFields } from '../src/domain/theory'
+import keywordTheory from './fixtures/aspic-keywords-theory.json'
 
 const parse = (changes: Partial<TheoryFields> = {}) => parseTheoryFields({ ...engineeringDemo, ...changes })
 
@@ -64,6 +65,44 @@ describe('explicit theory input notation', () => {
   it('reserves enough identifier length for generated applicability names', () => {
     expect(parse({ defeasibleRules: `${'r'.repeat(53)}: p => q` }).rules.at(-1)).toHaveProperty('name', `applicable_${'r'.repeat(53)}`)
     expect(() => parse({ defeasibleRules: `${'r'.repeat(54)}: p => q` })).toThrow('at most 53 characters')
+  })
+
+  it('preserves explicit applicability names and their undercut targets', () => {
+    const theory = parse({
+      defeasibleRules: 'd1 [use_primary]: test_pass, power_ok => pump_ready @ 700',
+      contraries: '~use_primary -> use_primary',
+    })
+    expect(theory.rules.at(-1)).toEqual({
+      id: 'd1', kind: 'defeasible', antecedents: ['test_pass', 'power_ok'],
+      consequent: 'pump_ready', name: 'use_primary', rank: 700,
+    })
+    expect(theory.contraries).toEqual([{ attacker: '~use_primary', target: 'use_primary' }])
+    expect(parse({ defeasibleRules: `${'r'.repeat(64)} [use_long]: p => q` }).rules.at(-1)).toHaveProperty('name', 'use_long')
+  })
+
+  it('reconstructs the complete keyword example without renaming its undercut applicability atoms', () => {
+    const fields: TheoryFields = {
+      axioms: keywordTheory.premises.filter(p => p.kind === 'axiom').map(p => p.atom).join('\n'),
+      premises: keywordTheory.premises.filter(p => p.kind === 'ordinary').map(p => `${p.atom} @ ${p.rank}`).join('\n'),
+      strictRules: keywordTheory.rules.filter(r => r.kind === 'strict').map(r => `${r.id}: ${r.antecedents.join(', ')} -> ${r.consequent}`).join('\n'),
+      defeasibleRules: keywordTheory.rules.filter(r => r.kind === 'defeasible').map(r => `${r.id} [${r.name}]: ${r.antecedents.join(', ')} => ${r.consequent} @ ${r.rank}`).join('\n'),
+      contraries: keywordTheory.contraries.map(c => `${c.attacker} -> ${c.target}`).join('\n'),
+      goal: keywordTheory.goal,
+      semantics: 'preferred', queryMode: 'sceptical', preference: 'last_link_partial',
+      priorities: keywordTheory.priorities.map(p => `${p.kind} ${p.higher} > ${p.lower}`).join('\n'),
+    }
+    const theory = parseTheoryFields(fields)
+    expect(theory).toEqual({ ...keywordTheory, rules: [...keywordTheory.rules].sort((a, b) => Number(a.kind === 'defeasible') - Number(b.kind === 'defeasible')) })
+  })
+
+  it.each(['', '~use_primary', 'use-primary', 'r'.repeat(65)])('rejects invalid explicit applicability name %j', name => {
+    expect(() => parse({ defeasibleRules: `d1 [${name}]: p => q` })).toThrow(/Defeasible rules, line 1/)
+  })
+
+  it('rejects duplicate applicability names and names on strict rules', () => {
+    expect(() => parse({ defeasibleRules: 'd1 [use]: p => q\nd2 [use]: p => r' })).toThrow('duplicate applicability name use')
+    expect(() => parse({ defeasibleRules: 'd1: p => q\nd2 [applicable_d1]: p => r' })).toThrow('duplicate applicability name applicable_d1')
+    expect(() => parse({ strictRules: 's1 [use]: p -> q' })).toThrow('a strict rule has no defeasible applicability name')
   })
 
   it('bounds the input before parsing', () => {

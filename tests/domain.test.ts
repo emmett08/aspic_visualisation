@@ -4,6 +4,8 @@ import type { AspicArgument, AspicDefeat, AspicView, Label } from '../src/domain
 import { sampleView } from '../src/domain/sample'
 import schema from '../schema/aspic-view.schema.json'
 import scopedReview from './fixtures/scoped-review.json'
+import keywordCompiled from './fixtures/aspic-keywords-compiled.json'
+import keywordFormal from './fixtures/aspic-keywords-formal.json'
 
 const clone = <T>(x: T): T => structuredClone(x)
 function node(id: string, conclusion: string, children: string[] = []): AspicArgument {
@@ -297,6 +299,30 @@ describe('snapshot identity and change classification', () => {
 
 
 describe('extension queries and typed evidence groups', () => {
+  it('imports the all-keywords EAL compilation with every reviewed directive kind', () => {
+    const value = validateAspicView(keywordCompiled)
+    expect(value.arguments).toHaveLength(15)
+    expect(value.defeats).toHaveLength(6)
+    expect(new Set(value.formal_directives.map(d => d.kind))).toEqual(new Set(['strict', 'rank', 'contrary', 'prefer']))
+    expect(value.arguments.some(a => a.top === 'strict' && a.origin.formal_review?.kind === 'strict')).toBe(true)
+    expect(value.preference).toBe('last_link_partial')
+    expect(value.query_status).toBe('accepted')
+  })
+  it('preserves all three defeat kinds, negative atoms and two preferred extensions in the explicit keyword theory', () => {
+    const value = validateAspicView(keywordFormal)
+    expect(value.arguments).toHaveLength(15)
+    expect(value.defeats).toHaveLength(10)
+    expect(new Set(value.defeats.map(d => d.kind))).toEqual(new Set(['undermine', 'rebut', 'undercut']))
+    expect(value.arguments.find(a => a.rule_id === 'primary_ready')?.rule_name).toBe('use_primary')
+    expect(value.arguments.some(a => a.conclusion === '~use_primary')).toBe(true)
+    expect(value.extensions).toHaveLength(2)
+    expect(value.query_status).toBe('accepted')
+    expect(value.arguments.filter(a => a.conclusion.startsWith('estimate_')).map(a => a.label)).toEqual(['undecided', 'undecided'])
+    const byId = new Map(value.arguments.map(a => [a.id, a]))
+    const undercut = value.defeats.find(d => d.kind === 'undercut' && d.subargument !== d.target)!
+    expect(byId.get(undercut.subargument)?.rule_name).toBe('use_primary')
+    expect(byId.get(undercut.target)?.rule_id).toBe('report_ready')
+  })
   it('imports the actual compound recursive EAL example with reviewed partial priorities', () => {
     const value = validateAspicView(scopedReview)
     expect(value.semantics).toBe('preferred'); expect(value.preference).toBe('last_link_partial')

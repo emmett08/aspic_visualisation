@@ -84,14 +84,14 @@ async function build() {
         <label class="theory-field theory-defeasible" for="theory-defeasible">
           <span>Defeasible rules</span>
           <textarea id="theory-defeasible" v-model="fields.defeasibleRules" aria-label="Defeasible rules" aria-describedby="defeasible-hint" spellcheck="false" placeholder="d1: test_pass, power_ok => pump_ready" :disabled="submitting" />
-          <small id="defeasible-hint">id: p, q ⇒ r, optionally @ rank. Undercut d1 by targeting applicable_d1.</small>
+          <small id="defeasible-hint">id [name]: p, q ⇒ r, optionally @ rank. Name defaults to applicable_id; an undercut targets that name.</small>
         </label>
       </div>
       <div class="assessment-fields">
         <label>Acceptance<select v-model="fields.semantics" aria-label="Acceptance semantics"><option value="grounded">Grounded</option><option value="preferred">Preferred extensions</option><option value="stable">Stable extensions</option></select></label>
         <label>Query<select v-model="fields.queryMode" aria-label="Query mode"><option value="sceptical">In every extension</option><option value="credulous">In at least one extension</option></select></label>
         <label>Preference<select v-model="fields.preference" aria-label="Preference ordering"><option value="minimum_rank">Lowest rank in the derivation</option><option value="last_link_rank">Last defeasible rule ranks</option><option value="last_link_partial">Declared last-link priorities</option></select></label>
-        <label v-if="fields.preference === 'last_link_partial'">Priorities<textarea v-model="fields.priorities" aria-label="Priorities" placeholder="rule d3 > d1&#10;premise inspection_ok > test_pass" /></label>
+        <label v-if="fields.preference === 'last_link_partial'" class="priority-field">Priorities<textarea v-model="fields.priorities" aria-label="Priorities" rows="3" spellcheck="false" placeholder="rule d3 > d1&#10;premise inspection_ok > test_pass" :disabled="submitting" /></label>
       </div>
       <div class="theory-footer">
         <label class="theory-goal" for="theory-goal">Goal<input id="theory-goal" v-model="fields.goal" placeholder="pump_ready" spellcheck="false" :disabled="submitting" /></label>
@@ -146,4 +146,6 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 .assessment-fields { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
 .assessment-fields label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .assessment-fields select, .assessment-fields textarea { padding: 8px; border: 1px solid #cbd7cf; border-radius: 6px; background: #fbfcfb; }
+.assessment-fields .priority-field { flex-basis: 100%; }
+.priority-field textarea { box-sizing: border-box; width: 100%; resize: vertical; font: 12px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; }
 </style>
