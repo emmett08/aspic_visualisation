@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import type { AspicView } from '../src/domain/aspic'
 const sample: AspicView = JSON.parse(readFileSync(new URL('../src/domain/sample.json', import.meta.url), 'utf8'))
+const keywordCompiled: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-compiled.json', import.meta.url), 'utf8'))
+const keywordFormal: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-formal.json', import.meta.url), 'utf8'))
 
 test('static build can populate theory fields while evaluation stays disabled', async ({ page }) => {
   await page.goto('/')
@@ -157,4 +159,46 @@ test('actual recursive pattern snapshot exposes the reviewed partial priority', 
   await expect(page.getByLabel('Snapshot metadata')).toContainText('synthetic-review/route-order')
   await page.getByLabel('Graph labelling').selectOption({label:'preferred extension 1 · 7 in'})
   await expect(page.locator('.argument-row')).toHaveCount(10)
+})
+
+test('all reviewed keyword directives survive source compilation and remain inspectable', async ({page}) => {
+  await page.goto('/')
+  await importView(page, keywordCompiled, 'aspic-keywords-compiled.json')
+  await expect(page.locator('.argument-row')).toHaveCount(15)
+  await page.getByRole('button', {name: 'Snapshot details'}).click()
+  await page.locator('.reviewed-directives summary').click()
+  for (const kind of ['strict', 'rank', 'contrary', 'prefer']) {
+    await expect(page.locator('.reviewed-directives code').filter({hasText: new RegExp(`^${kind} `)}).first()).toBeVisible()
+  }
+  await expect(page.getByLabel('Snapshot metadata')).toContainText('last_link_partial')
+  await expect(page.locator('.goal-result')).toHaveText('accepted')
+})
+
+test('complete formal keyword theory exposes all attacks and extension-specific labels', async ({page}) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.goto('/')
+  await importView(page, keywordFormal, 'aspic-keywords-formal.json')
+  await expect(page.locator('.argument-row')).toHaveCount(15)
+  await page.getByRole('button', {name: /^Relations/}).click()
+  for (const kind of ['undermine', 'rebut', 'undercut']) {
+    const index = keywordFormal.defeats.findIndex(d => d.kind === kind && d.subargument !== d.target)
+    await page.locator('.relation-row').filter({hasText: new RegExp(`^${kind}`)}).filter({hasText: `at subargument ${keywordFormal.defeats[index]!.subargument}`}).last().click()
+    await expect(page.locator('.witness-box')).toContainText(keywordFormal.defeats[index]!.subargument)
+    await expect(page.getByRole('heading', {name: 'Exact attacked subargument'})).toBeVisible()
+  }
+  await page.getByRole('button', {name: 'Arguments', exact: true}).click()
+  const estimate = keywordFormal.arguments.find(a => a.conclusion === 'estimate_normal')!
+  const estimateRow = page.locator('.argument-row').filter({hasText: 'estimate_normal'})
+  await expect(estimateRow.locator('.label-chip')).toHaveText('undecided')
+  for (let index = 0; index < keywordFormal.extensions.length; index++) {
+    const extension = keywordFormal.extensions[index]!
+    await page.getByLabel('Graph labelling').selectOption({label: `preferred extension ${index + 1} · ${extension.length} in`})
+    await expect(estimateRow.locator('.label-chip')).toHaveText(extension.includes(estimate.id) ? 'in' : 'out')
+  }
+  await page.getByLabel('Graph labelling').selectOption({label: 'Grounded'})
+  await expect(estimateRow.locator('.label-chip')).toHaveText('undecided')
+  await page.locator('.argument-row').filter({hasText: '~use_primary'}).click()
+  await expect(page.locator('.details-panel h3')).toHaveText('~use_primary')
+  expect(errors).toEqual([])
 })
