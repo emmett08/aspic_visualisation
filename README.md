@@ -19,15 +19,16 @@ Open the printed local address. Snapshot files are parsed in the browser and are
 
 ### Optional theory editor
 
-To construct arguments from the text areas, install Python 3.11+ and the pinned companion EAL/3 implementation, then enable the development-only bridge:
+To construct arguments from the text areas, install `eal-aspic-solve` from the reviewed [native EAL checkout](https://github.com/emmett08/eal-mcp), then select that executable explicitly. From this app's directory:
 
 ```sh
-python3 -m venv .venv
-.venv/bin/pip install 'engineering-argument-language @ git+https://github.com/emmett08/earl.git@8229fa711868a88f9354a2b3f7b1b08bf7e3f769'
-ASPIC_SOLVER=1 ASPIC_PYTHON="$PWD/.venv/bin/python" npm run dev -- --host 127.0.0.1
+cargo install --locked --path /absolute/path/to/eal-mcp/crates/eal-cli \
+  --bin eal-aspic-solve --root "$PWD/.runtime/native"
+ASPIC_SOLVER=1 ASPIC_SOLVER_EXECUTABLE="$PWD/.runtime/native/bin/eal-aspic-solve" \
+  npm run dev -- --host 127.0.0.1
 ```
 
-Repository access is required to install that revision. Alternatively, install that exact checked-out EAL revision into the virtual environment. Select **Load engineering demo**, then **Build graph**. The pump example has a test-based route undercut by vibration evidence and a surviving inspection route. Successful evaluations add session snapshots; failed edits preserve the current graph.
+Use the paired native producer revision containing this binary. `ASPIC_SOLVER_EXECUTABLE` must be an absolute path; the bridge never searches `PATH`. A missing or invalid executable leaves evaluation unavailable. Select **Load engineering demo**, then **Build graph**. The pump example has a test-based route undercut by vibration evidence and a surviving inspection route. Successful evaluations add session snapshots; failed edits preserve the current graph.
 
 Enter one element per line:
 
@@ -43,21 +44,15 @@ Enter one element per line:
 
 Omitted ranks default to 500; larger ranks are stronger. Select minimum-rank, last-link numerical or last-link partial preference. Partial priorities use lines such as `rule d3 > d1` or `premise p > q`. `~p` is an atom spelling: it does not automatically create a contrary relation. The finite profile constructs premise-founded cyclic theories without repeating a conclusion along a branch. Select grounded, preferred or stable semantics and a credulous or sceptical query. An empty stable family is reported as `no_extension`, never accepted. Its text notation is a UI adapter to EAL's existing JSON theory contract; it does not change EAL grammar.
 
-Only explicitly submitted theories are sent to the local Python process. The bridge delegates construction and checked export to EAL, enforces a 64 KiB request limit and 15-second deadline, and accepts same-origin requests one at a time. It does not run collectors. It is disabled by default and absent from the production static build; keep it on a trusted local development host. Production hosting of a solver service requires a separate deployment design.
+Only explicitly submitted theories are sent to the selected native process. The bridge delegates construction and checked export to EAL, then applies the same schema and graph checks used for imported files before returning success. It accepts same-origin requests one at a time, with a 64 KiB upload limit, 10-second upload deadline, 4 MiB response limit and 15-second worker deadline. Disconnecting or closing Vite terminates the worker; the concurrency slot is released after the process closes. The worker receives a closed environment with an empty `PATH`, without inherited credentials. The bridge is disabled by default and absent from the production static build; keep it on a trusted local development host. Production hosting of a solver service requires a separate deployment design.
 
 ## Bring an EAL assessment
 
-Use the pinned companion EAL/3 implementation from [EAL PR #49](https://github.com/emmett08/earl/pull/49):
+Use the native EAL checked exporter on a completed compile response:
 
 ```sh
-# In an EAL workspace, save the full compile-aspic response as result.json.
-eal --workspace . export-aspic result.json --output view.json
-```
-
-Or generate the maintained synthetic example from the EAL repository:
-
-```sh
-python examples/api-load-test/aspic_compiled_demo.py --export-view /tmp/view.json
+# Save the complete compile-aspic response as result.json.
+eal-core export-aspic result.json > view.json
 ```
 
 Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The app consumes the versioned [`aspic-view/3` JSON contract](schema/aspic-view.schema.json), not EAL source text.
@@ -71,7 +66,7 @@ Import `view.json` in this app. Explicit formal theories can use the same EAL ex
 
 EAL's newline-based source notation supports scoped metadata and typed pattern instances. For example, an argument using `[premises measured] via rule => reportable` depends on a claim that another argument or `apply` instance establishes. The exporter constructs these nested derivations, and this app displays their immediate links and shared evidence. EAL/3 also supports modules, source imports, local block arguments, compound patterns, decreasing typed-list recursion, pure expressions and explicit conditional scope transfer. Reviewed `strict`, `rank`, `contrary` and `prefer` directives retain their formal-compilation meaning; ordinary EAL claim assessment is a separate contract.
 
-The import contract is `aspic-view/3`, matching the producer schema exactly. Regenerate older exports with the pinned EAL implementation before importing them.
+The import contract is `aspic-view/3`, matching the producer schema exactly. Compatible existing EAL exports remain importable; regenerate older schema versions before importing them.
 
 ## Trust boundary
 
@@ -89,11 +84,11 @@ npm test
 npm run build
 npx playwright install chromium
 npm run test:browser
-# With the pinned EAL runtime installed in .venv:
-.venv/bin/python -m unittest server/test_solve.py
+# Separate integration suite: requires the installed native solver.
+ASPIC_SOLVER_EXECUTABLE=/absolute/path/to/eal-aspic-solve npm run test:browser:native
 ```
 
-Dependencies are pinned and `package-lock.json` is committed. See [architecture](docs/architecture.md) for the module boundary and comparison rules. Vue text interpolation and Cytoscape labels render imported values as text; imported HTML is never executed.
+Dependencies are pinned and `package-lock.json` is committed. Normal type, unit, build and static browser checks require no Python or EAL installation. The HTTP unit suite uses a standalone Node fixture process on the Linux test host; the separate native browser suite exercises the installed solver without mocked responses. The GitHub validation workflow is manual-only. See [architecture](docs/architecture.md) for the module boundary and comparison rules. Vue text interpolation and Cytoscape labels render imported values as text; imported HTML is never executed.
 
 The bundled engineering snapshot is generated from EAL/3 source by the companion
 compiler, including a typed pattern instance, nested premise derivations and reviewed
@@ -110,6 +105,6 @@ preserve the same undercut targets when rebuilding that example.
 the exact theory rebuilt through the live solver, both preferred extensions and
 all reviewed source directives.
 
-The optional bridge accepts an operator-owned budget file through `EAL_LIMITS_FILE=/absolute/path/limits.toml`. Its `[limits]` table can raise solver construction or extension-search budgets; browser requests cannot change it. Solver exhaustion reports an incomplete calculation and preserves the current graph. Request bytes, worker deadline and HTTP deadline remain separately bounded.
+The optional bridge accepts an operator-owned budget file through `EAL_LIMITS_FILE=/absolute/path/limits.toml`, passed to the binary as `--limits`. Its `[limits]` table can raise solver construction or extension-search budgets; browser requests cannot change this path or the executable. Solver exhaustion reports an incomplete calculation and preserves the current graph. Invalid requests, incomplete calculations and unavailable workers remain distinct errors. Request bytes, response bytes, upload deadline and worker deadline remain separately bounded.
 
 Unavailable evidence is grouped by typed cause, preserving the distinction between a failed predicate and an absent observation. The useful grouping behaviour and checks from PR #3 are incorporated here; [its earlier captures](docs/evidence-outcomes/README.md) remain labelled as historical. No legacy import adapter is included.

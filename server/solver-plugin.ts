@@ -1,96 +1,147 @@
-import { spawn } from 'node:child_process';
-import { delimiter, resolve } from 'node:path';
-import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { Plugin } from 'vite';
+import type { IncomingMessage, ServerResponse } from 'node:http'
+import type { Plugin } from 'vite'
+import { validateAspicView } from '../src/domain/aspic.ts'
+import {
+  checkedConfiguration, decodeUtf8, runSolver, SolverFailure,
+  type SolverConfiguration,
+} from './solver-process.ts'
 
-const MAX_REQUEST_BYTES = 64 * 1024;
-const MAX_RESPONSE_BYTES = 4 * 1024 * 1024;
+const MAX_REQUEST_BYTES = 64 * 1024
+const UPLOAD_TIMEOUT_MS = 10_000
 
-/** Optional development-only bridge. Formal construction stays in EAL. */
-export function solverPlugin(root: string, enabled: boolean, python: string): Plugin {
-  let busy = false;
+export interface SolverPluginOptions extends SolverConfiguration { enabled: boolean }
+
+function readUpload(req: IncomingMessage, signal: AbortSignal): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    let bytes = 0
+    const cleanup = () => {
+      clearTimeout(timer)
+      req.off('data', data)
+      req.off('end', end)
+      req.off('error', error)
+      signal.removeEventListener('abort', abort)
+    }
+    const fail = (failure: SolverFailure) => {
+      cleanup()
+      req.pause()
+      reject(failure)
+    }
+    const abort = () => fail(new SolverFailure(499, 'cancelled', 'The solver request was cancelled.'))
+    const error = () => abort()
+    const data = (chunk: Buffer | string) => {
+      const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
+      bytes += buffer.length
+      if (bytes > MAX_REQUEST_BYTES) {
+        fail(new SolverFailure(413, 'invalid_request', 'The theory exceeds the 64 KiB request limit.'))
+      } else chunks.push(buffer)
+    }
+    const end = () => {
+      cleanup()
+      try { resolve(decodeUtf8(Buffer.concat(chunks))) }
+      catch { reject(new SolverFailure(400, 'invalid_request', 'Send a UTF-8 JSON theory.')) }
+    }
+    const timer = setTimeout(() => fail(new SolverFailure(408, 'invalid_request', 'The theory upload timed out.')), UPLOAD_TIMEOUT_MS)
+    req.on('data', data)
+    req.once('end', end)
+    req.once('error', error)
+    signal.addEventListener('abort', abort, { once: true })
+    if (signal.aborted) abort()
+  })
+}
+
+function admitRequest(text: string): void {
+  let value: unknown
+  try { value = JSON.parse(text) }
+  catch { throw new SolverFailure(400, 'invalid_request', 'Send a valid JSON theory.') }
+  if (!value || typeof value !== 'object' || Array.isArray(value)
+      || Object.keys(value).length !== 1 || !Object.hasOwn(value, 'theory')
+      || !(value as { theory?: unknown }).theory
+      || typeof (value as { theory: unknown }).theory !== 'object'
+      || Array.isArray((value as { theory: unknown }).theory)) {
+    throw new SolverFailure(400, 'invalid_request', 'Request must contain exactly one theory object.')
+  }
+}
+
+function sameOrigin(req: IncomingMessage): boolean {
+  if (req.headers['sec-fetch-site'] === 'cross-site') return false
+  if (!req.headers.origin) return true
+  const scheme = 'encrypted' in req.socket && req.socket.encrypted ? 'https' : 'http'
+  try {
+    const expected = new URL(`${scheme}://${req.headers.host}`).origin
+    return req.headers.origin === expected
+  } catch { return false }
+}
+
+/** Optional local development bridge; construction and checked export stay in EAL. */
+export function solverPlugin(options: SolverPluginOptions): Plugin {
+  let busy = false
+  let closed = false
+  const active = new Map<AbortController, Promise<void>>()
+  const close = async () => {
+    closed = true
+    const pending = [...active]
+    pending.forEach(([controller]) => controller.abort())
+    await Promise.all(pending.map(([, settled]) => settled))
+  }
   return {
-    name: 'eal-solver-bridge',
+    name: 'eal-native-solver-bridge',
     apply: 'serve',
+    closeBundle: close,
     configureServer(server) {
+      server.httpServer?.once('close', () => { void close() })
       server.middlewares.use('/api/solve', async (req: IncomingMessage, res: ServerResponse) => {
-        const reply = (status: number, data: unknown) => {
-          if (res.destroyed || res.writableEnded) return;
-          res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
-          res.end(JSON.stringify(data));
-        };
-        if (!enabled) return reply(503, { error: 'The optional EAL solver is not enabled.' });
-        if (req.method !== 'POST') return reply(405, { error: 'Use POST with a JSON theory.' });
-        // Browser requests must come from this same local preview, never a third-party page.
-        if (req.headers.origin) {
-          try {
-            if (new URL(req.headers.origin).host !== req.headers.host)
-              return reply(403, { error: 'Cross-origin requests are not accepted.' });
-          } catch { return reply(403, { error: 'Invalid request origin.' }); }
+        // An aborted upload can emit ECONNRESET after its abort callback has
+        // removed the read listeners. Retain an error sink for this stream's life.
+        req.on('error', () => {})
+        const reply = (status: number, error: string, code: string) => {
+          if (res.destroyed || res.writableEnded) return
+          res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' })
+          // Stop a rejected, unfinished upload after its error response is written.
+          if (!req.complete) res.once('finish', () => req.destroy())
+          res.end(JSON.stringify({ error, code }))
         }
+        if (!options.enabled) return reply(503, 'The optional EAL solver is not enabled.', 'unavailable')
+        if (closed) return reply(503, 'The solver bridge is closing.', 'unavailable')
+        if (req.method !== 'POST') return reply(405, 'Use POST with a JSON theory.', 'invalid_request')
+        if (!sameOrigin(req)) return reply(403, 'Cross-origin requests are not accepted.', 'invalid_request')
         if (req.headers['content-type']?.split(';')[0]?.trim() !== 'application/json')
-          return reply(415, { error: 'Content-Type must be application/json.' });
-        if (busy) return reply(429, { error: 'A theory is already being evaluated. Try again shortly.' });
-        busy = true;
-        let timer: ReturnType<typeof setTimeout> | undefined;
+          return reply(415, 'Content-Type must be application/json.', 'invalid_request')
+        if (busy) return reply(429, 'A theory is already being evaluated. Try again shortly.', 'busy')
+        busy = true
+        const controller = new AbortController()
+        let settled!: () => void
+        active.set(controller, new Promise<void>(resolve => { settled = resolve }))
+        const abort = () => controller.abort()
+        const responseClosed = () => { if (!res.writableEnded) abort() }
+        req.once('aborted', abort)
+        res.once('close', responseClosed)
         try {
-          timer = setTimeout(() => {
-            reply(408, { error: 'The theory upload timed out.' });
-            req.destroy();
-          }, 10_000);
-          const chunks: Buffer[] = [];
-          let bytes = 0;
-          for await (const chunk of req) {
-            const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-            bytes += buffer.length;
-            if (bytes > MAX_REQUEST_BYTES) {
-              reply(413, { error: 'The theory exceeds the 64 KiB request limit.' });
-              return;
-            }
-            chunks.push(buffer);
+          const configuration = checkedConfiguration(options)
+          const text = await readUpload(req, controller.signal)
+          admitRequest(text)
+          // Preserve numeric lexemes and duplicate fields for native strict JSON admission.
+          const value = await runSolver(configuration, text, controller.signal)
+          let view
+          try { view = validateAspicView(value) }
+          catch { throw new SolverFailure(502, 'invalid_response', 'The solver returned a view that failed graph validation.') }
+          if (!res.destroyed && !res.writableEnded) {
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' })
+            res.end(JSON.stringify(view))
           }
-          const text = Buffer.concat(chunks).toString('utf8');
-          clearTimeout(timer);
-          try { JSON.parse(text); } catch { return reply(400, { error: 'The request is not valid JSON.' }); }
-          const child = spawn(python, [resolve(root, 'server/solve.py')], {
-            cwd: root,
-            env: { ...process.env, PYTHONPATH: [resolve(root, '.runtime/eal-source/src'), resolve(root, '.runtime/python')].join(delimiter), PYTHONDONTWRITEBYTECODE: '1' },
-            stdio: ['pipe', 'pipe', 'pipe'],
-          });
-          let stdout = '';
-          let stderr = '';
-          let exceeded = false;
-          let timedOut = false;
-          timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, 15_000);
-          child.stdout.on('data', (data: Buffer) => {
-            if (Buffer.byteLength(stdout) + data.length > MAX_RESPONSE_BYTES) {
-              exceeded = true;
-              child.kill('SIGKILL');
-            } else stdout += data.toString('utf8');
-          });
-          child.stderr.on('data', (data: Buffer) => {
-            if (stderr.length < 8192) stderr += data.toString('utf8');
-          });
-          child.stdin.on('error', () => { /* A rejected or unavailable solver can close stdin early. */ });
-          child.stdin.end(text);
-          const exitCode = await new Promise<number | null>((resolveExit, reject) => {
-            child.on('error', reject);
-            child.on('close', resolveExit);
-          });
-          if (timedOut) return reply(504, { error: 'The bounded solver exceeded its 15 second deadline.' });
-          if (exceeded) return reply(422, { error: 'The solver result exceeds the 4 MiB limit.' });
-          if (exitCode !== 0) return reply(422, { error: stderr.trim() || 'The theory could not be evaluated.' });
-          try { reply(200, JSON.parse(stdout)); }
-          catch { reply(502, { error: 'The solver returned an invalid response.' }); }
         } catch (error) {
-          reply(503, { error: error instanceof Error && 'code' in error && error.code === 'ENOENT'
-            ? 'Python is unavailable. Follow the optional solver setup in README.'
-            : 'The local solver is unavailable. Check its installation and try again.' });
+          const failure = error instanceof SolverFailure ? error
+            : new SolverFailure(503, 'unavailable', 'The configured native solver is unavailable.')
+          reply(failure.status, failure.message, failure.code)
         } finally {
-          if (timer) clearTimeout(timer);
-          busy = false;
+          req.off('aborted', abort)
+          res.off('close', responseClosed)
+          active.delete(controller)
+          // Process close precedes slot release, so cancellation cannot overlap workers.
+          busy = false
+          settled()
         }
-      });
+      })
     },
-  };
+  }
 }
