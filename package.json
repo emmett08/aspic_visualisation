@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "vue-tsc --noEmit",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:browser:native": "playwright test --config playwright.native.config.ts"
   },
   "dependencies": {
     "ajv": "8.20.0",
