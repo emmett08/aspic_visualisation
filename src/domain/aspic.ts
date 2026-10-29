@@ -12,10 +12,13 @@ export type Label = 'in' | 'out' | 'undecided'
 export type FormalStatus = 'accepted' | 'rejected' | 'undecided' | 'unconstructed'
 export type ClaimStatus = 'supported' | 'contested' | 'unsupported' | 'out_of_scope'
 export type DefeatKind = 'undermine' | 'rebut' | 'undercut'
-export type AvailabilityIssue = 'predicate_not_met' | 'missing_observation' | 'stale_observation'
+export type AvailabilityIssue = 'predicate_not_met' | 'predicate_unresolved' | 'dependency_unavailable'
+  | 'missing_observation' | 'stale_observation'
   | 'tool_error' | 'invalid_observation' | 'out_of_scope'
 export const availabilityIssueText: Record<AvailabilityIssue, string> = {
   predicate_not_met: 'The observed value did not meet the declared condition.',
+  predicate_unresolved: 'The declared condition could not be evaluated from the supplied data.',
+  dependency_unavailable: 'A required evidence dependency was unavailable.',
   missing_observation: 'No observation was supplied.',
   stale_observation: 'The observation exceeded its permitted age.',
   tool_error: 'Evidence collection failed.',
@@ -23,7 +26,8 @@ export const availabilityIssueText: Record<AvailabilityIssue, string> = {
   out_of_scope: 'The observation was outside the declared scope.',
 }
 export const availabilityIssueTitle: Record<AvailabilityIssue, string> = {
-  predicate_not_met: 'Predicate not met', missing_observation: 'Missing observation',
+  predicate_not_met: 'Predicate not met', predicate_unresolved: 'Predicate unresolved',
+  dependency_unavailable: 'Dependency unavailable', missing_observation: 'Missing observation',
   stale_observation: 'Stale observation', tool_error: 'Collection error',
   invalid_observation: 'Invalid observation', out_of_scope: 'Out of scope',
 }
