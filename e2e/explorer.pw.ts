@@ -4,6 +4,7 @@ import type { AspicView } from '../src/domain/aspic'
 const sample: AspicView = JSON.parse(readFileSync(new URL('../src/domain/sample.json', import.meta.url), 'utf8'))
 const keywordCompiled: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-compiled.json', import.meta.url), 'utf8'))
 const keywordFormal: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-formal.json', import.meta.url), 'utf8'))
+const nativeEal4: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/eal4-native/view.json', import.meta.url), 'utf8'))
 
 test('static build can populate theory fields while evaluation stays disabled', async ({ page }) => {
   await page.goto('/')
@@ -136,6 +137,22 @@ test('failed predicates and absent observations have separate typed panels', asy
   await expect(page.locator('.evidence-group[data-issue="missing_observation"]')).toContainText('missing_probe')
   await expect(page.locator('.evidence-group[data-issue="predicate_not_met"]')).toContainText('negative_predicate')
   await expect(page.locator('.evidence-group[data-issue="predicate_not_met"]')).not.toContainText('missing_probe')
+})
+
+test('native EAL/4 imports preserve unresolved predicates and unavailable dependencies', async ({ page }) => {
+  await page.goto('/')
+  await importView(page, nativeEal4, 'eal4-native.json')
+  await expect(page.locator('.argument-row')).toHaveCount(nativeEal4.arguments.length)
+  await expect(page.locator('.goal-result')).toHaveText('accepted')
+  const unresolved = page.locator('.evidence-group[data-issue="predicate_unresolved"]')
+  const dependency = page.locator('.evidence-group[data-issue="dependency_unavailable"]')
+  await expect(unresolved).toContainText('Predicate unresolved')
+  await expect(unresolved).toContainText('The declared condition could not be evaluated from the supplied data.')
+  await expect(dependency).toContainText('Dependency unavailable')
+  await expect(dependency).toContainText('A required evidence dependency was unavailable.')
+  await expect(dependency).toContainText('derived')
+  await expect(unresolved).not.toContainText('derived')
+  await expect(page.getByRole('alert')).toHaveCount(0)
 })
 
 test('selected extension labels preserve the grounded graph and restore on snapshot changes', async ({page}) => {

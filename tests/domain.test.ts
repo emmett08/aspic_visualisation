@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { buildGraph, compareSnapshots, groundedLabels, MAX_FILE_BYTES, MAX_ARGUMENTS, MAX_DEFEATS, parseAspicView, validateAspicView } from '../src/domain/aspic'
+import { buildGraph, compareSnapshots, evidenceGroups, groundedLabels, MAX_FILE_BYTES, MAX_ARGUMENTS, MAX_DEFEATS, parseAspicView, validateAspicView } from '../src/domain/aspic'
 import type { AspicArgument, AspicDefeat, AspicView, Label } from '../src/domain/aspic'
 import { sampleView } from '../src/domain/sample'
 import schema from '../schema/aspic-view.schema.json'
 import scopedReview from './fixtures/scoped-review.json'
 import keywordCompiled from './fixtures/aspic-keywords-compiled.json'
 import keywordFormal from './fixtures/aspic-keywords-formal.json'
+import nativeEal4 from './fixtures/eal4-native/view.json'
 
 const clone = <T>(x: T): T => structuredClone(x)
 function node(id: string, conclusion: string, children: string[] = []): AspicArgument {
@@ -62,6 +63,33 @@ describe('versioned import boundary', () => {
     expect(sampleView.arguments.some(a => a.top === 'strict')).toBe(true)
     expect(sampleView.formal_status).toBe('accepted')
   })
+  it('imports a native EAL/4 export and groups unresolved predicates separately from unavailable dependencies', () => {
+    const input = parseAspicView(JSON.stringify(nativeEal4))
+    expect(input.profile).toBe('EAL/4-compiled-aspic/5')
+    expect(input.execution_limits.method_work).toBe(1_000_000_000)
+    expect(input.arguments).toHaveLength(2)
+    expect(input.query_status).toBe('accepted')
+    const groups = evidenceGroups(input)
+    expect(groups.map(group => [group.issue, group.items.map(item => item.name)])).toEqual([
+      ['predicate_unresolved', ['unresolved']],
+      ['dependency_unavailable', ['derived']],
+      ['missing_observation', ['missing']],
+    ])
+    expect(groups.every(group => group.description.length > 0)).toBe(true)
+    expect(input.arguments.map(argument => argument.origin.name)).not.toContain('unresolved')
+    expect(input.arguments.map(argument => argument.origin.name)).not.toContain('derived')
+  })
+  it('requires a positive integer method-work budget and rejects unknown budget fields', () => {
+    const absent = clone(nativeEal4) as unknown as { execution_limits: Record<string, unknown> }
+    delete absent.execution_limits.method_work
+    expect(() => parseAspicView(JSON.stringify(absent))).toThrow('method_work')
+    for (const value of [0, -1, 1.5, '1000000000']) {
+      const invalid = { ...nativeEal4, execution_limits: { ...nativeEal4.execution_limits, method_work: value } }
+      expect(() => parseAspicView(JSON.stringify(invalid))).toThrow('/execution_limits/method_work')
+    }
+    const unknown = { ...nativeEal4, execution_limits: { ...nativeEal4.execution_limits, unknown_work: 1 } }
+    expect(() => parseAspicView(JSON.stringify(unknown))).toThrow('additional properties')
+  })
   it('preserves reviewed strictness and rank alongside immediate nested derivations', () => {
     const input = validateAspicView(clone(sampleView))
     const strict = input.arguments.find(a => a.origin.name === 'report_arg')!
@@ -77,7 +105,7 @@ describe('versioned import boundary', () => {
     expect(parent.rank).toBe(700)
     expect(parent.origin.formal_review?.kind).toBe('rank')
   })
-  it('requires v2 typed availability causes and keeps absence distinct from a failed predicate', () => {
+  it('requires typed availability causes and keeps absence distinct from a failed predicate', () => {
     const input = clone(sampleView)
     input.unavailable_evidence = [
       { name: 'missing', reasons: ['Synthetic absent observation.'], availability_issues: ['missing_observation'], span: null },

@@ -1,0 +1,168 @@
+{
+  "schema": "aspic-view/3",
+  "theory_digest": "a3f26e741515d5d5ae4eafb25a488383c7b110d4a35c1ff4229a7733e30a4ae2",
+  "evaluated_at": "2026-10-24T12:00:00Z",
+  "validation": {
+    "formal_result": "recomputed",
+    "provenance": "supplied"
+  },
+  "profile": "EAL/4-compiled-aspic/5",
+  "goal": "cdd5ace9e018dbd62336c",
+  "goal_claim": "working",
+  "formal_status": "accepted",
+  "execution_limits": {
+    "source_bytes": 1048576,
+    "source_tokens": 100000,
+    "structural_values": 100000,
+    "declarations": 4096,
+    "premise_depth": 128,
+    "expansion_depth": 128,
+    "applications": 1000,
+    "expanded_references": 100000,
+    "expression_nodes": 10000,
+    "expression_depth": 128,
+    "json_depth": 64,
+    "json_nodes": 100000,
+    "record_bytes": 4194304,
+    "collection_evidence": 128,
+    "method_work": 1000000000,
+    "composed_edges": 131072,
+    "abstract_attacks": 65536,
+    "formal_premises": 64,
+    "formal_rules": 64,
+    "formal_antecedents": 8,
+    "formal_atoms": 128,
+    "formal_contraries": 128,
+    "formal_arguments": 128,
+    "formal_defeats": 4096,
+    "formal_construction": 100000,
+    "extension_search": 100000
+  },
+  "formal_directives": [],
+  "claim_status": "supported",
+  "authored_claim_status": "supported",
+  "source_digest": "8d65d807054761c8c2209df4e75ff9b65d411dd6a09e2bb8694644757d21282a",
+  "snapshot_digest": "437631a90c25c4108fc96c67c4381db2a33f0fccea02d2118518675e5590cfbb",
+  "arguments": [
+    {
+      "id": "A0",
+      "conclusion": "e604cee807f644af47487",
+      "top": "ordinary",
+      "subarguments": [],
+      "strength": 500,
+      "direct_subarguments": [],
+      "label": "in",
+      "rank": 500,
+      "display_conclusion": "observed",
+      "origin": {
+        "kind": "evidence",
+        "name": "observed",
+        "span": {
+          "line": 8,
+          "column": 1,
+          "end_line": 15,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "synthetic-eal4-observed",
+          "data_digest": "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451e364b48475280",
+          "request_digest": "be616fe7266ad5c93298f3702a74b4160e310b1e227b589f9ead3daec8b8674b",
+          "collected_at": "2026-10-24T12:00:00Z",
+          "tool_binding_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "source_file": "case.eal"
+      }
+    },
+    {
+      "id": "A1",
+      "conclusion": "cdd5ace9e018dbd62336c",
+      "top": "defeasible",
+      "subarguments": [
+        "A0"
+      ],
+      "strength": 500,
+      "direct_subarguments": [
+        "A0"
+      ],
+      "label": "in",
+      "rule_id": "ra18603086e5bdf9df88c",
+      "rule_name": "xc809c3a575321e8c4c5b",
+      "rank": 500,
+      "display_conclusion": "working",
+      "origin": {
+        "kind": "argument",
+        "name": "support",
+        "span": {
+          "line": 49,
+          "column": 1,
+          "end_line": 50,
+          "end_column": 1
+        },
+        "formal_review": null,
+        "rationale": "The observed test supports the declared bench result.",
+        "reasoning": "measured",
+        "source_file": "case.eal"
+      },
+      "authored_statement": "The measured test passed at this bench."
+    }
+  ],
+  "defeats": [],
+  "unavailable_evidence": [
+    {
+      "name": "derived",
+      "reasons": [
+        "Dependency missing is unavailable, stale or invalid"
+      ],
+      "availability_issues": [
+        "dependency_unavailable"
+      ],
+      "span": {
+        "line": 24,
+        "column": 1,
+        "end_line": 32,
+        "end_column": 2
+      }
+    },
+    {
+      "name": "missing",
+      "reasons": [
+        "No evidence record is available"
+      ],
+      "availability_issues": [
+        "missing_observation"
+      ],
+      "span": {
+        "line": 33,
+        "column": 1,
+        "end_line": 40,
+        "end_column": 2
+      }
+    },
+    {
+      "name": "unresolved",
+      "reasons": [
+        "Field 'passed' is missing"
+      ],
+      "availability_issues": [
+        "predicate_unresolved"
+      ],
+      "span": {
+        "line": 16,
+        "column": 1,
+        "end_line": 23,
+        "end_column": 2
+      }
+    }
+  ],
+  "semantics": "grounded",
+  "query_mode": "sceptical",
+  "query_status": "accepted",
+  "preference": "minimum_rank",
+  "extensions": [
+    [
+      "A0",
+      "A1"
+    ]
+  ]
+}

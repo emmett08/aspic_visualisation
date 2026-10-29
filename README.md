@@ -48,14 +48,23 @@ Only explicitly submitted theories are sent to the selected native process. The 
 
 ## Bring an EAL assessment
 
-Use the native EAL checked exporter on a completed compile response:
+The app consumes `aspic-view/3` JSON, not `.eal` source or an ordinary EAL
+assessment response. Use the native EAL/4 compiler and checked exporter on the
+source, observation records, context and original assessment time. For example,
+from a directory containing `case.eal`, `records.json` and `context.json`:
 
 ```sh
-# Save the complete compile-aspic response as result.json.
-eal-core export-aspic result.json > view.json
+eal-core --workspace . --methods all compile-aspic case.eal --claim working \
+  --now 2026-10-24T12:00:00Z --context @context.json --records records.json > result.json
+eal-core --workspace . export-aspic result.json > view.json
 ```
 
-Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The app consumes the versioned [`aspic-view/3` JSON contract](schema/aspic-view.schema.json), not EAL source text.
+Substitute the selected claim and recorded assessment time. The formal compiler
+is opt-in and retains the ordinary EAL assessment separately. An incomplete
+compile result cannot be exported. If a case needs raised formal-construction
+budgets, supply the same operator-owned `--limits limits.toml` to both commands.
+
+Import `view.json` in this app. Explicit formal theories can use the same EAL exporter with JSON containing `theory` and `formal`. The versioned [`aspic-view/3` JSON contract](schema/aspic-view.schema.json) includes the captured `method_work` budget and distinguishes unresolved predicates, unavailable dependencies and absent observations.
 
 - Solid derivation edges connect an immediate subargument to the argument using it. Reused evidence remains one node.
 - Dashed defeat edges connect attacker to defeated argument. The inspector identifies the exact attacked subargument and whether the defeat undermines, rebuts or undercuts.
@@ -64,9 +73,9 @@ Import `view.json` in this app. Explicit formal theories can use the same EAL ex
 - Search and the argument list provide keyboard access to graph selection. Relation filters and neighbourhood focus make hidden graph content explicit.
 - Import successive snapshots to record session events and compare added, removed and relabelled derivations. Restoring an event restores its graph. Import order is not evidence chronology or a solver execution trace; differing source or assessment identities remain visible.
 
-EAL's newline-based source notation supports scoped metadata and typed pattern instances. For example, an argument using `[premises measured] via rule => reportable` depends on a claim that another argument or `apply` instance establishes. The exporter constructs these nested derivations, and this app displays their immediate links and shared evidence. EAL/3 also supports modules, source imports, local block arguments, compound patterns, decreasing typed-list recursion, pure expressions and explicit conditional scope transfer. Reviewed `strict`, `rank`, `contrary` and `prefer` directives retain their formal-compilation meaning; ordinary EAL claim assessment is a separate contract.
+EAL/4 source supports scoped metadata and typed pattern instances. For example, an argument using `[premises measured] via rule => reportable` depends on a claim that another argument or `apply` instance establishes. The exporter constructs these nested derivations, and this app displays their immediate links and shared evidence. Modules, source imports, local block arguments, compound patterns, decreasing typed-list recursion, pure expressions and explicit conditional scope transfer are compiled by EAL. Reviewed `strict`, `rank`, `contrary` and `prefer` directives retain their formal-compilation meaning; ordinary EAL claim assessment is a separate contract.
 
-The import contract is `aspic-view/3`, matching the producer schema exactly. Compatible existing EAL exports remain importable; regenerate older schema versions before importing them.
+The import contract is `aspic-view/3`, matching the native producer schema exactly. Regenerate older exports that lack required captured budgets or use older schema versions before importing them.
 
 ## Trust boundary
 
@@ -90,10 +99,12 @@ ASPIC_SOLVER_EXECUTABLE=/absolute/path/to/eal-aspic-solve npm run test:browser:n
 
 Dependencies are pinned and `package-lock.json` is committed. Normal type, unit, build and static browser checks require no Python or EAL installation. The HTTP unit suite uses a standalone Node fixture process on the Linux test host; the separate native browser suite exercises the installed solver without mocked responses. The GitHub validation workflow is manual-only. See [architecture](docs/architecture.md) for the module boundary and comparison rules. Vue text interpolation and Cytoscape labels render imported values as text; imported HTML is never executed.
 
-The bundled engineering snapshot is generated from EAL/3 source by the companion
-compiler, including a typed pattern instance, nested premise derivations and reviewed
-ASPIC+ annotations. [Cloud browser verification and screenshots](docs/verification-eal31.md)
-record an actual local import of this sample.
+The bundled engineering graph originated from the historical EAL/3 compiler,
+including a typed pattern instance, nested premise derivations and reviewed
+ASPIC+ annotations. Its fixture limits have been migrated to the current import
+contract; it is not a fresh native export. [Earlier browser verification and screenshots](docs/verification-eal31.md)
+record its original local import. A separate [reproducible native EAL/4 fixture](tests/fixtures/README.md)
+exercises the full JSON importer and the two additional evidence-availability causes.
 
 The companion `examples/aspic-keywords` example also supplies full source-directive
 and explicit-theory exports. [Reproducible fixtures](tests/fixtures/README.md) cover

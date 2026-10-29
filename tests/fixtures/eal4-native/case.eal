@@ -1,0 +1,51 @@
+language "EAL/4"
+environment lab {
+ require site == "bench"
+}
+tool reader {
+ version "1"
+}
+evidence observed {
+ tool reader
+ kind test
+ environment lab
+ max_age 60
+ input {"sample":1}
+ require passed == true
+}
+evidence unresolved {
+ tool reader
+ kind test
+ environment lab
+ max_age 60
+ input {"sample":2}
+ require passed == true
+}
+evidence derived {
+ derive parent
+ kind calculation
+ environment lab
+ max_age 60
+ input {"parent":null}
+ bind "/parent" from missing ""
+ require passed == true
+}
+evidence missing {
+ tool reader
+ kind test
+ environment lab
+ max_age 60
+ input {"sample":3}
+ require passed == true
+}
+reasoning measured {
+ method "structured/1"
+ rationale "The observed test supports the declared bench result."
+}
+claim working {
+ statement "The measured test passed at this bench."
+ environment lab
+}
+argument support = [evidence observed] via measured => working
+argument unresolved_support = [evidence unresolved] via measured => working
+argument derived_support = [evidence derived] via measured => working

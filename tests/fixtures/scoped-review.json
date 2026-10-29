@@ -40,6 +40,7 @@
     "json_nodes": 100000,
     "record_bytes": 4194304,
     "collection_evidence": 128,
+    "method_work": 1000000000,
     "composed_edges": 131072,
     "abstract_attacks": 65536,
     "formal_premises": 64,

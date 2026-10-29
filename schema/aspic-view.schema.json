@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/emmett08/earl/blob/main/docs/aspic-view.schema.json",
+  "$id": "https://github.com/emmett08/eal-mcp/blob/main/contracts/schemas/aspic-view.schema.json",
   "title": "ASPIC+ graph export",
-  "description": "The Python exporter recomputes the formal result. Source metadata is supplied, not authenticated. Importing this document alone does not independently verify these assertions.",
+  "description": "The Rust exporter recomputes the formal result. Source metadata records caller-supplied provenance. Consumers validate graph consistency and apply their own import policies.",
   "type": "object",
   "properties": {
     "schema": {
@@ -142,6 +142,10 @@
           "type": "integer",
           "minimum": 1
         },
+        "method_work": {
+          "type": "integer",
+          "minimum": 1
+        },
         "composed_edges": {
           "type": "integer",
           "minimum": 1
@@ -202,6 +206,7 @@
         "json_nodes",
         "record_bytes",
         "collection_evidence",
+        "method_work",
         "composed_edges",
         "abstract_attacks",
         "formal_premises",
@@ -983,6 +988,8 @@
             "items": {
               "enum": [
                 "predicate_not_met",
+                "predicate_unresolved",
+                "dependency_unavailable",
                 "missing_observation",
                 "stale_observation",
                 "tool_error",
