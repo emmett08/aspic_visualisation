@@ -1,0 +1,767 @@
+{
+  "schema": "aspic-view/3",
+  "theory_digest": "eb423464fde5664b29ea39d4020925e38deab30dd6b9e7a4e6f8d08a523585fc",
+  "evaluated_at": "2026-10-24T12:00:00Z",
+  "validation": {
+    "formal_result": "recomputed",
+    "provenance": "supplied"
+  },
+  "profile": "EAL/4-compiled-aspic/5",
+  "goal": "c6df0ce8dbd85160fc548",
+  "goal_claim": "checked_claim",
+  "formal_status": "accepted",
+  "execution_limits": {
+    "source_bytes": 1048576,
+    "source_tokens": 100000,
+    "structural_values": 100000,
+    "declarations": 4096,
+    "premise_depth": 128,
+    "expansion_depth": 128,
+    "applications": 1000,
+    "expanded_references": 100000,
+    "expression_nodes": 10000,
+    "expression_depth": 128,
+    "json_depth": 64,
+    "json_nodes": 100000,
+    "record_bytes": 4194304,
+    "collection_evidence": 128,
+    "method_work": 1000000000,
+    "composed_edges": 131072,
+    "abstract_attacks": 65536,
+    "formal_premises": 64,
+    "formal_rules": 64,
+    "formal_antecedents": 8,
+    "formal_atoms": 128,
+    "formal_contraries": 128,
+    "formal_arguments": 128,
+    "formal_defeats": 4096,
+    "formal_construction": 100000,
+    "extension_search": 100000
+  },
+  "formal_directives": [],
+  "claim_status": "supported",
+  "authored_claim_status": "supported",
+  "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e",
+  "snapshot_digest": "4e8b4285219b9db81d16ea3ccbbfe1a4bc04d43cb4cff2cfedf1046372ea00e2",
+  "arguments": [
+    {
+      "id": "A0",
+      "conclusion": "e8ebe9552b2e1b0160e8e",
+      "top": "ordinary",
+      "subarguments": [],
+      "strength": 500,
+      "direct_subarguments": [],
+      "label": "in",
+      "rank": 500,
+      "display_conclusion": "checked_input",
+      "origin": {
+        "kind": "evidence",
+        "name": "checked_input",
+        "span": {
+          "line": 12,
+          "column": 1,
+          "end_line": 18,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "synthetic-grounding-checked_input",
+          "data_digest": "cd1c5ec89d303911897d6a23ec3dcb1344748c378bb3ea95d654b79b99a7120a",
+          "request_digest": "f534d47893b46411ae03458ff780fab5cb8f28500ab6cb2fc66fb35ffbaa60d6",
+          "collected_at": "2026-10-24T12:00:00Z",
+          "tool_binding_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "source_file": "case.eal"
+      }
+    },
+    {
+      "id": "A1",
+      "conclusion": "e68d0f6b37b69e7a6c033",
+      "top": "ordinary",
+      "subarguments": [],
+      "strength": 500,
+      "direct_subarguments": [],
+      "label": "in",
+      "rank": 500,
+      "display_conclusion": "undefined_symbol_input",
+      "origin": {
+        "kind": "evidence",
+        "name": "undefined_symbol_input",
+        "span": {
+          "line": 56,
+          "column": 1,
+          "end_line": 62,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "synthetic-grounding-undefined_symbol_input",
+          "data_digest": "181060ddb23eac52b04b45dade37780ffd1e579811fb28ade47908e7c35bd9b9",
+          "request_digest": "571bdb88daa4b41a99c132a6d2a5701af7ecb3a8f11de293248786da5b5087f7",
+          "collected_at": "2026-10-24T12:00:00Z",
+          "tool_binding_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "source_file": "case.eal"
+      }
+    },
+    {
+      "id": "A2",
+      "conclusion": "ecea21236bbdd15159d53",
+      "top": "ordinary",
+      "subarguments": [],
+      "strength": 500,
+      "direct_subarguments": [],
+      "label": "in",
+      "rank": 500,
+      "display_conclusion": "wrong_unit_input",
+      "origin": {
+        "kind": "evidence",
+        "name": "wrong_unit_input",
+        "span": {
+          "line": 34,
+          "column": 1,
+          "end_line": 40,
+          "end_column": 2
+        },
+        "formal_review": null,
+        "observation": {
+          "run_id": "synthetic-grounding-wrong_unit_input",
+          "data_digest": "95c65962dcbb3e35b78b4ffb39bf9912feed7ba6a4077d1c9e0b812b4ea9cd60",
+          "request_digest": "3a2d855214f9ab1a486cab237ca7183481a1661104b9f1bdcd4fe99191b13c3d",
+          "collected_at": "2026-10-24T12:00:00Z",
+          "tool_binding_digest": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "source_file": "case.eal"
+      }
+    },
+    {
+      "id": "A3",
+      "conclusion": "c6df0ce8dbd85160fc548",
+      "top": "defeasible",
+      "subarguments": [
+        "A0"
+      ],
+      "strength": 500,
+      "direct_subarguments": [
+        "A0"
+      ],
+      "label": "in",
+      "rule_id": "rce708d95ce21e2973be1",
+      "rule_name": "xb9cbff5706843923d6f2",
+      "rank": 500,
+      "display_conclusion": "checked_claim",
+      "origin": {
+        "kind": "argument",
+        "name": "checked_route",
+        "span": {
+          "line": 33,
+          "column": 1,
+          "end_line": 34,
+          "end_column": 1
+        },
+        "formal_review": null,
+        "rationale": "Check the declared synthetic source predicates, symbol coverage and applicability facets.",
+        "reasoning": "verify_grounding",
+        "source_file": "case.eal",
+        "computation": {
+          "method": "grounded/1",
+          "status": "supported",
+          "reasons": [
+            "Method grounded/1: Evaluated the declared source grounding and applicability obligations"
+          ],
+          "details": {
+            "verified": true,
+            "verification": {
+              "schema": "eal.verification-report/1",
+              "target_id": "checked_claim",
+              "mode": "empirical",
+              "status": "pass",
+              "obligations": [
+                {
+                  "id": "calibration",
+                  "role": "warrant",
+                  "status": "pass",
+                  "reasons": [
+                    "Field 'calibrated' == True holds (observed True)"
+                  ],
+                  "details": {
+                    "observation_id": "reading_S",
+                    "predicate": {
+                      "path": "calibrated",
+                      "operator": "==",
+                      "expected": true,
+                      "expression": null
+                    },
+                    "read_fields": {
+                      "calibrated": true
+                    },
+                    "observed_at": "2026-10-24T12:00:00Z",
+                    "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+                  }
+                },
+                {
+                  "id": "applicability:reading_S:identity",
+                  "role": "applicability",
+                  "status": "pass",
+                  "reasons": [
+                    "The source applicability facet matches the required target"
+                  ],
+                  "details": {
+                    "observation_id": "reading_S",
+                    "facet": "identity",
+                    "pointer": "/device",
+                    "expected": "supply-S",
+                    "actual": "supply-S"
+                  }
+                },
+                {
+                  "id": "applicability:reading_S:unit",
+                  "role": "applicability",
+                  "status": "pass",
+                  "reasons": [
+                    "The source applicability facet matches the required target"
+                  ],
+                  "details": {
+                    "observation_id": "reading_S",
+                    "facet": "unit",
+                    "pointer": "/unit",
+                    "expected": "V",
+                    "actual": "V"
+                  }
+                },
+                {
+                  "id": "applicability:reading_S:scope",
+                  "role": "applicability",
+                  "status": "pass",
+                  "reasons": [
+                    "The source applicability facet matches the required target"
+                  ],
+                  "details": {
+                    "observation_id": "reading_S",
+                    "facet": "scope",
+                    "pointer": "/scope",
+                    "expected": {
+                      "config": "bench-C"
+                    },
+                    "actual": {
+                      "config": "bench-C"
+                    }
+                  }
+                },
+                {
+                  "id": "applicability:reading_S:time",
+                  "role": "applicability",
+                  "status": "pass",
+                  "reasons": [
+                    "Original source age and the containing half-open applicability interval satisfy the required target"
+                  ],
+                  "details": {
+                    "observation_id": "reading_S",
+                    "observed_at": "2026-10-24T12:00:00Z",
+                    "assessed_at": "2026-10-24T12:00:00Z",
+                    "expected_from": "2026-10-24T11:00:00Z",
+                    "expected_until": "2026-10-24T13:00:00Z",
+                    "max_age_seconds": 60,
+                    "actual_from": "2026-10-24T11:00:00Z",
+                    "actual_until": "2026-10-24T13:00:00Z",
+                    "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+                  }
+                }
+              ],
+              "atoms": [
+                {
+                  "symbol": "low_voltage",
+                  "observation_id": "reading_S",
+                  "status": "pass",
+                  "truth": true,
+                  "reasons": [
+                    "Field 'voltage' < 10 holds (observed 9)"
+                  ],
+                  "details": {
+                    "observation_id": "reading_S",
+                    "predicate": {
+                      "path": "voltage",
+                      "operator": "<",
+                      "expected": 10,
+                      "expression": null
+                    },
+                    "read_fields": {
+                      "voltage": 9
+                    },
+                    "observed_at": "2026-10-24T12:00:00Z",
+                    "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+                  }
+                }
+              ],
+              "formulas": [
+                {
+                  "id": "low_voltage_premise",
+                  "status": "pass",
+                  "truth": true,
+                  "reasons": [
+                    "The formal premise holds under the acquired atom valuation"
+                  ],
+                  "details": {
+                    "formula": "low_voltage",
+                    "valuation": {
+                      "low_voltage": true
+                    },
+                    "missing_atoms": []
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "authored_statement": "The declared synthetic low-voltage premise has checked grounding and applicability (checked)."
+    }
+  ],
+  "defeats": [],
+  "unavailable_evidence": [],
+  "verification_reports": [
+    {
+      "argument_name": "checked_route",
+      "source": "native_method",
+      "method_status": "supported",
+      "reasons": [
+        "Method grounded/1: Evaluated the declared source grounding and applicability obligations"
+      ],
+      "report": {
+        "schema": "eal.verification-report/1",
+        "target_id": "checked_claim",
+        "mode": "empirical",
+        "status": "pass",
+        "obligations": [
+          {
+            "id": "calibration",
+            "role": "warrant",
+            "status": "pass",
+            "reasons": [
+              "Field 'calibrated' == True holds (observed True)"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "predicate": {
+                "path": "calibrated",
+                "operator": "==",
+                "expected": true,
+                "expression": null
+              },
+              "read_fields": {
+                "calibrated": true
+              },
+              "observed_at": "2026-10-24T12:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          },
+          {
+            "id": "applicability:reading_S:identity",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "identity",
+              "pointer": "/device",
+              "expected": "supply-S",
+              "actual": "supply-S"
+            }
+          },
+          {
+            "id": "applicability:reading_S:unit",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "unit",
+              "pointer": "/unit",
+              "expected": "V",
+              "actual": "V"
+            }
+          },
+          {
+            "id": "applicability:reading_S:scope",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "scope",
+              "pointer": "/scope",
+              "expected": {
+                "config": "bench-C"
+              },
+              "actual": {
+                "config": "bench-C"
+              }
+            }
+          },
+          {
+            "id": "applicability:reading_S:time",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "Original source age and the containing half-open applicability interval satisfy the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "observed_at": "2026-10-24T12:00:00Z",
+              "assessed_at": "2026-10-24T12:00:00Z",
+              "expected_from": "2026-10-24T11:00:00Z",
+              "expected_until": "2026-10-24T13:00:00Z",
+              "max_age_seconds": 60,
+              "actual_from": "2026-10-24T11:00:00Z",
+              "actual_until": "2026-10-24T13:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          }
+        ],
+        "atoms": [
+          {
+            "symbol": "low_voltage",
+            "observation_id": "reading_S",
+            "status": "pass",
+            "truth": true,
+            "reasons": [
+              "Field 'voltage' < 10 holds (observed 9)"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "predicate": {
+                "path": "voltage",
+                "operator": "<",
+                "expected": 10,
+                "expression": null
+              },
+              "read_fields": {
+                "voltage": 9
+              },
+              "observed_at": "2026-10-24T12:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          }
+        ],
+        "formulas": [
+          {
+            "id": "low_voltage_premise",
+            "status": "pass",
+            "truth": true,
+            "reasons": [
+              "The formal premise holds under the acquired atom valuation"
+            ],
+            "details": {
+              "formula": "low_voltage",
+              "valuation": {
+                "low_voltage": true
+              },
+              "missing_atoms": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argument_name": "undefined_symbol_route",
+      "source": "native_method",
+      "method_status": "supported",
+      "reasons": [
+        "Method grounded/1: Evaluated the declared source grounding and applicability obligations"
+      ],
+      "report": {
+        "schema": "eal.verification-report/1",
+        "target_id": "undefined_symbol_claim",
+        "mode": "empirical",
+        "status": "unknown",
+        "obligations": [
+          {
+            "id": "calibration",
+            "role": "warrant",
+            "status": "pass",
+            "reasons": [
+              "Field 'calibrated' == True holds (observed True)"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "predicate": {
+                "path": "calibrated",
+                "operator": "==",
+                "expected": true,
+                "expression": null
+              },
+              "read_fields": {
+                "calibrated": true
+              },
+              "observed_at": "2026-10-24T12:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          },
+          {
+            "id": "applicability:reading_S:identity",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "identity",
+              "pointer": "/device",
+              "expected": "supply-S",
+              "actual": "supply-S"
+            }
+          },
+          {
+            "id": "applicability:reading_S:unit",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "unit",
+              "pointer": "/unit",
+              "expected": "V",
+              "actual": "V"
+            }
+          },
+          {
+            "id": "applicability:reading_S:scope",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "scope",
+              "pointer": "/scope",
+              "expected": {
+                "config": "bench-C"
+              },
+              "actual": {
+                "config": "bench-C"
+              }
+            }
+          },
+          {
+            "id": "applicability:reading_S:time",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "Original source age and the containing half-open applicability interval satisfy the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "observed_at": "2026-10-24T12:00:00Z",
+              "assessed_at": "2026-10-24T12:00:00Z",
+              "expected_from": "2026-10-24T11:00:00Z",
+              "expected_until": "2026-10-24T13:00:00Z",
+              "max_age_seconds": 60,
+              "actual_from": "2026-10-24T11:00:00Z",
+              "actual_until": "2026-10-24T13:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          }
+        ],
+        "atoms": [
+          {
+            "symbol": "low_voltage",
+            "observation_id": null,
+            "status": "unknown",
+            "truth": null,
+            "reasons": [
+              "No executable source predicate defines this required formula atom"
+            ],
+            "details": {}
+          }
+        ],
+        "formulas": [
+          {
+            "id": "low_voltage_premise",
+            "status": "unknown",
+            "truth": null,
+            "reasons": [
+              "Required atom denotations or observations remain unavailable"
+            ],
+            "details": {
+              "formula": "low_voltage",
+              "valuation": {},
+              "missing_atoms": [
+                "low_voltage"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "argument_name": "wrong_unit_route",
+      "source": "native_method",
+      "method_status": "supported",
+      "reasons": [
+        "Method grounded/1: Evaluated the declared source grounding and applicability obligations"
+      ],
+      "report": {
+        "schema": "eal.verification-report/1",
+        "target_id": "wrong_unit_claim",
+        "mode": "empirical",
+        "status": "fail",
+        "obligations": [
+          {
+            "id": "calibration",
+            "role": "warrant",
+            "status": "pass",
+            "reasons": [
+              "Field 'calibrated' == True holds (observed True)"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "predicate": {
+                "path": "calibrated",
+                "operator": "==",
+                "expected": true,
+                "expression": null
+              },
+              "read_fields": {
+                "calibrated": true
+              },
+              "observed_at": "2026-10-24T12:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          },
+          {
+            "id": "applicability:reading_S:identity",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "identity",
+              "pointer": "/device",
+              "expected": "supply-S",
+              "actual": "supply-S"
+            }
+          },
+          {
+            "id": "applicability:reading_S:unit",
+            "role": "applicability",
+            "status": "fail",
+            "reasons": [
+              "The source applicability facet differs from the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "unit",
+              "pointer": "/unit",
+              "expected": "V",
+              "actual": "mV"
+            }
+          },
+          {
+            "id": "applicability:reading_S:scope",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "The source applicability facet matches the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "facet": "scope",
+              "pointer": "/scope",
+              "expected": {
+                "config": "bench-C"
+              },
+              "actual": {
+                "config": "bench-C"
+              }
+            }
+          },
+          {
+            "id": "applicability:reading_S:time",
+            "role": "applicability",
+            "status": "pass",
+            "reasons": [
+              "Original source age and the containing half-open applicability interval satisfy the required target"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "observed_at": "2026-10-24T12:00:00Z",
+              "assessed_at": "2026-10-24T12:00:00Z",
+              "expected_from": "2026-10-24T11:00:00Z",
+              "expected_until": "2026-10-24T13:00:00Z",
+              "max_age_seconds": 60,
+              "actual_from": "2026-10-24T11:00:00Z",
+              "actual_until": "2026-10-24T13:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          }
+        ],
+        "atoms": [
+          {
+            "symbol": "low_voltage",
+            "observation_id": "reading_S",
+            "status": "pass",
+            "truth": true,
+            "reasons": [
+              "Field 'voltage' < 10 holds (observed 9)"
+            ],
+            "details": {
+              "observation_id": "reading_S",
+              "predicate": {
+                "path": "voltage",
+                "operator": "<",
+                "expected": 10,
+                "expression": null
+              },
+              "read_fields": {
+                "voltage": 9
+              },
+              "observed_at": "2026-10-24T12:00:00Z",
+              "source_digest": "ef0f7c933c0ee6dd0f8d23b47cfb3db0080a0df1788a72d94ce8d5f66b8fd05e"
+            }
+          }
+        ],
+        "formulas": [
+          {
+            "id": "low_voltage_premise",
+            "status": "pass",
+            "truth": true,
+            "reasons": [
+              "The formal premise holds under the acquired atom valuation"
+            ],
+            "details": {
+              "formula": "low_voltage",
+              "valuation": {
+                "low_voltage": true
+              },
+              "missing_atoms": []
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "semantics": "grounded",
+  "query_mode": "sceptical",
+  "query_status": "accepted",
+  "preference": "minimum_rank",
+  "extensions": [
+    [
+      "A0",
+      "A1",
+      "A2",
+      "A3"
+    ]
+  ]
+}

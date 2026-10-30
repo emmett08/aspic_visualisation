@@ -6,6 +6,7 @@ const keywordCompiled: AspicView = JSON.parse(readFileSync(new URL('../tests/fix
 const keywordFormal: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-formal.json', import.meta.url), 'utf8'))
 const nativeEal4: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/eal4-native/view.json', import.meta.url), 'utf8'))
 const finiteProbability: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/finite-probability/view.json', import.meta.url), 'utf8'))
+const nativeVerification: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/grounded-verification/view.json', import.meta.url), 'utf8'))
 
 test('static build can populate theory fields while evaluation stays disabled', async ({ page }) => {
   await page.goto('/')
@@ -15,6 +16,8 @@ test('static build can populate theory fields while evaluation stays disabled', 
   await expect(page.getByLabel('Goal', { exact: true })).toHaveValue('pump_ready')
   await expect(page.getByRole('button', { name: 'Build graph', exact: true })).toBeDisabled()
   await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+  await expect(page.getByLabel('Recorded verification obligations')).toContainText('Verification not supplied.')
+  await expect(page.getByLabel('Recorded verification obligations')).toContainText('Source-to-formula coverage and applicability remain unassessed')
 })
 
 async function importView(page: import('@playwright/test').Page, view: unknown, name: string) {
@@ -63,6 +66,79 @@ test('native finite-model proof displays exact quantities and a structural carri
   const carrier = finiteProbability.arguments.findIndex(argument => argument.origin.kind === 'structural basis')
   await page.locator('.argument-row').nth(carrier).click()
   await expect(page.locator('.details-panel')).toContainText('no observation')
+})
+
+test('verification obligations remain inspectable for unconstructed routes without changing graph acceptance', async ({ page }) => {
+  await page.goto('/')
+  const view = structuredClone(sample)
+  const hostile = '<img src=x onerror="window.injected=true">'
+  view.verification_reports = [{
+    argument_name: 'unconstructed_route', source: 'native_method', method_status: 'supported', reasons: [], report: {
+      schema: 'eal.verification-report/1', target_id: 'power_requirement', mode: 'empirical', status: 'unknown',
+      obligations: [
+        { id: 'source_binding', role: 'grounding', status: 'pass', reasons: [], details: { observation_id: 'reading_S', pointer: '/voltage', unit: 'V' } },
+        { id: 'calibration', role: 'applicability', status: 'unknown', reasons: ['Calibration record is unavailable.', hostile], details: {} },
+        { id: 'context', role: 'applicability', status: 'fail', reasons: ['Source device differs.'], details: {} },
+      ],
+      atoms: [{ symbol: 'voltage_low', observation_id: 'reading_S', status: 'pass', truth: true, reasons: [], details: { value: { schema: 'eal.exact-number/1', numerator: '9007199254740993', denominator: '1000000000000000', unit: 'V' }, source: hostile } }],
+      formulas: [{ id: 'premise_0', status: 'pass', truth: true, reasons: [], details: { formula: 'voltage_low' } }],
+    },
+  }, {
+    argument_name: 'model_route', source: 'engarg_assurance', method_status: 'supported', reasons: [], report: {
+      schema: 'eal.verification-report/1', target_id: 'model_consequence', mode: 'mathematical', status: 'pass',
+      obligations: [{ id: 'model_scope', role: 'grounding', status: 'not_required', reasons: ['Declared model consequence.'], details: {} }], atoms: [], formulas: [],
+    },
+  }, { argument_name: 'missing_source', source: 'native_method', method_status: 'not_run', reasons: ['Source unavailable.'], report: null }]
+  await importView(page, view, 'verification-obligations.json')
+  const reports = page.getByLabel('Recorded verification obligations', { exact: true })
+  await expect(reports).not.toContainText('Verification not supplied.')
+  await expect(reports).toContainText('separate from authored status and graph acceptance')
+  await expect(reports).toContainText('not authenticated')
+  await reports.getByText('unconstructed_route · power_requirement', { exact: true }).click()
+  await expect(reports).toContainText('Empirical claim')
+  await expect(reports.locator('[data-verification-status="unknown"]').first()).toBeVisible()
+  await expect(reports.locator('[data-verification-status="fail"]')).toBeVisible()
+  await expect(reports.getByText(hostile, { exact: true })).toBeVisible()
+  const bindings = reports.getByLabel('Source to symbol bindings')
+  await expect(bindings).toContainText('voltage_low ← reading_S')
+  await bindings.locator('summary').click()
+  await expect(bindings.getByLabel('Exact verification quantities')).toContainText('9007199254740993/1000000000000000')
+  await reports.getByText('model_route · model_consequence', { exact: true }).click()
+  await expect(reports).toContainText('Mathematical consequence')
+  await expect(reports).toContainText('EngArg assurance after native replay')
+  await expect(reports).toContainText('Its inference requires a separate proof result.')
+  await expect(reports).toContainText('Applying it to an external system requires separate evidence.')
+  await expect(reports.locator('[data-verification-status="not_required"]')).toBeVisible()
+  await reports.getByText('missing_source · No verification report', { exact: true }).click()
+  await expect(reports).toContainText('Verifier execution: Not run.')
+  await expect(reports).toContainText('No obligation results were produced.')
+  await expect(reports.locator('img')).toHaveCount(0)
+  expect(await page.evaluate(() => Object.hasOwn(window, 'injected'))).toBe(false)
+  await expect(page.locator('.argument-row')).toHaveCount(sample.arguments.length)
+  await page.setViewportSize({ width: 390, height: 844 })
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+})
+
+test('native grounding export preserves failed applicability and undefined source bindings', async ({ page }) => {
+  await page.goto('/')
+  await importView(page, nativeVerification, 'native-grounding.json')
+  const reports = page.getByLabel('Recorded verification obligations', { exact: true })
+  await expect(page.locator('.goal-result')).toHaveText('accepted')
+  await expect(page.locator('.argument-row')).toHaveCount(4)
+  await reports.getByText('wrong_unit_route · wrong_unit_claim', { exact: true }).click()
+  const failed = reports.locator('.verification-report').filter({ hasText: 'wrong_unit_route' })
+  await expect(failed.locator('[data-verification-status="fail"]').first()).toBeVisible()
+  await expect(failed).toContainText('Verifier execution: Completed.')
+  const unit = failed.locator('.verification-obligations > li').filter({ hasText: 'applicability:reading_S:unit' })
+  await unit.getByText('Check, source binding and result', { exact: true }).click()
+  await expect(unit.locator('pre')).toContainText('"actual": "mV"')
+  await expect(unit.locator('pre')).toContainText('"expected": "V"')
+  await reports.getByText('undefined_symbol_route · undefined_symbol_claim', { exact: true }).click()
+  const unknown = reports.locator('.verification-report').filter({ hasText: 'undefined_symbol_route' })
+  await expect(unknown.getByLabel('Source to symbol bindings')).toContainText('low_voltage ← No source binding')
+  await expect(unknown.getByLabel('Source to symbol bindings')).toContainText('value unknown')
+  await expect(unknown).toContainText('Verifier execution: Completed.')
+  await expect(page.getByRole('alert')).toHaveCount(0)
 })
 
 test('one graph supports keyboard selection, exact defeat witnesses and visible filters', async ({ page }) => {

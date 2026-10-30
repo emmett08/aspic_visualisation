@@ -71,6 +71,7 @@ Import `view.json` in this app. Explicit formal theories can use the same EAL ex
 - `in`, `out` and `undecided` initially show grounded graph labels. **Graph labelling** can inspect each supplied extension. Selected query acceptance is displayed separately; labels are graph-relative, not truth values. A strict inference may still depend on fallible premises.
 - Source text, rationale, declaration location, observation metadata and review references remain inspectable. Unavailable evidence has typed causes such as `missing_observation`, `stale_observation` and `predicate_not_met`; an observed failed condition remains distinct from an absent observation. These entries never become negative premises.
 - When supplied by EAL, the inspector shows the native method identifier, result status, reasons and method-specific details separately from authored rationale. `structured/1` retains authored support without supplying a formal proof. A method result has separate premise-truth, prose-correspondence and applicability obligations; the browser does not rerun or authenticate the imported computation.
+- Verification reports show mathematical, empirical and defeasible claim modes, source-to-symbol bindings, formula evaluations and applicability outcomes. Reports for failed or unresolved routes remain visible even when those routes have no graph node. Skipped checks show no invented results.
 - Search and the argument list provide keyboard access to graph selection. Relation filters and neighbourhood focus make hidden graph content explicit.
 - Import successive snapshots to record session events and compare added, removed and relabelled derivations. Restoring an event restores its graph. Import order is not evidence chronology or a solver execution trace; differing source or assessment identities remain visible.
 
@@ -83,10 +84,31 @@ snapshots remain valid without implying that a method result was supplied.
 Its closed outer shape retains `method`, native `status`, `reasons` and open
 method-specific `details`. Details remain inert JSON and obey the captured JSON
 depth/node budgets plus independent browser ceilings of 64 levels and 100,000
-nodes across imported computation details. Exact quantities should use the
+nodes across imported computation details and verification reports. Exact quantities should use the
 method's explicit string representation when they exceed JavaScript number
 precision. Computations for routes omitted from the constructed graph remain
 available in EAL's source map and assessment, rather than becoming graph nodes.
+
+The optional `verification_reports` list retains every native `grounded/1`
+execution, including failed, unresolved, skipped and incomplete checks. Its
+`eal.verification-report/1` records distinguish a completed verifier execution
+from an obligation passing. Reports attached by EngArg are labelled separately
+from native method reports; both remain supplied provenance. Exact report
+quantities use string numerators and denominators. Unsafe integer JSON numbers
+in verification reports are rejected to avoid displaying rounded evidence.
+
+For an EngArg investigation, export the retained candidate execution with its
+matching assurance receipt:
+
+```sh
+engarg eal export-aspic --input candidate/package/case.eal \
+  --execution candidate/execution.json --verification candidate/verification.json \
+  --eal-core /absolute/path/to/eal-core --output verified-view.json
+```
+
+Use the actual retained artifact paths. EngArg checks the receipt's execution
+bindings before attaching its verification reports. Import `verified-view.json`
+through the same local snapshot control.
 
 ## Trust boundary
 
