@@ -1,7 +1,8 @@
 import Ajv2020 from 'ajv/dist/2020.js'
 import schema from '../../schema/aspic-view.schema.json'
-import { computationDetailsIssue } from './computation'
+import { jsonDetailsIssue } from './json-details'
 import type { ComputationResult } from './computation'
+import type { RecordedVerification } from './verification'
 
 /** Read-only browser boundary for the versioned EAL ASPIC+ export.
  * Validation checks the supplied graph. It cannot authenticate provenance or prove
@@ -77,6 +78,7 @@ export interface AspicView {
     name: string; reasons: string[]; availability_issues: AvailabilityIssue[];
     span: SourceSpan | null
   }[]
+  verification_reports?: RecordedVerification[]
 }
 
 export class ViewValidationError extends Error {
@@ -208,8 +210,9 @@ export function validateAspicView(value: unknown): AspicView {
     fail(issue?.instancePath || 'view', `${issue?.message ?? 'invalid export'}${issue?.params ? ` (${JSON.stringify(issue.params)})` : ''}`)
   }
   const view = value as AspicView
-  const detailsIssue = computationDetailsIssue(
-    view.arguments.flatMap(argument => argument.origin.computation ? [argument.origin.computation] : []),
+  const detailsIssue = jsonDetailsIssue(
+    [...view.arguments.flatMap(argument => argument.origin.computation ? [{ value: argument.origin.computation.details }] : []),
+      ...(view.verification_reports ?? []).map(value => ({ value, requireSafeIntegers: true }))],
     { json_depth: view.execution_limits.json_depth!, json_nodes: view.execution_limits.json_nodes! },
   )
   if (detailsIssue) fail('computation', detailsIssue)

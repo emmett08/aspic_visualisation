@@ -1080,6 +1080,263 @@
         ],
         "additionalProperties": false
       }
+    },
+    "verification_reports": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": {
+        "type": "object",
+        "properties": {
+          "argument_name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100000
+          },
+          "report": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "schema": {
+                    "const": "eal.verification-report/1"
+                  },
+                  "target_id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100000
+                  },
+                  "mode": {
+                    "enum": [
+                      "mathematical",
+                      "empirical",
+                      "defeasible"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "pass",
+                      "fail",
+                      "unknown"
+                    ]
+                  },
+                  "obligations": {
+                    "type": "array",
+                    "maxItems": 100000,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100000
+                        },
+                        "role": {
+                          "enum": [
+                            "premise",
+                            "grounding",
+                            "applicability",
+                            "warrant"
+                          ]
+                        },
+                        "status": {
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "unknown",
+                            "not_required"
+                          ]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "maxItems": 100000,
+                          "items": {
+                            "type": "string",
+                            "maxLength": 100000
+                          }
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "reasons",
+                        "details"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "atoms": {
+                    "type": "array",
+                    "maxItems": 100000,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "symbol": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100000
+                        },
+                        "observation_id": {
+                          "anyOf": [
+                            {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 100000
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
+                        "status": {
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "unknown",
+                            "not_required"
+                          ]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "maxItems": 100000,
+                          "items": {
+                            "type": "string",
+                            "maxLength": 100000
+                          }
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        "truth": {
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "symbol",
+                        "observation_id",
+                        "status",
+                        "reasons",
+                        "details",
+                        "truth"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "formulas": {
+                    "type": "array",
+                    "maxItems": 100000,
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100000
+                        },
+                        "status": {
+                          "enum": [
+                            "pass",
+                            "fail",
+                            "unknown",
+                            "not_required"
+                          ]
+                        },
+                        "reasons": {
+                          "type": "array",
+                          "maxItems": 100000,
+                          "items": {
+                            "type": "string",
+                            "maxLength": 100000
+                          }
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        "truth": {
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "reasons",
+                        "details",
+                        "truth"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "schema",
+                  "target_id",
+                  "mode",
+                  "status",
+                  "obligations",
+                  "atoms",
+                  "formulas"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "method_status": {
+            "enum": [
+              "supported",
+              "unsupported",
+              "not_run",
+              "incomplete"
+            ],
+            "description": "Execution status of the verifier; supported means it completed, independently of whether the report passed."
+          },
+          "reasons": {
+            "type": "array",
+            "maxItems": 100000,
+            "items": {
+              "type": "string",
+              "maxLength": 100000
+            }
+          },
+          "source": {
+            "enum": [
+              "native_method",
+              "engarg_assurance"
+            ]
+          }
+        },
+        "required": [
+          "argument_name",
+          "source",
+          "method_status",
+          "reasons",
+          "report"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Supplied grounding verification records from native methods or replay-bound EngArg assurance, including targets absent from the constructed graph. The records do not authenticate source observations."
     }
   },
   "required": [

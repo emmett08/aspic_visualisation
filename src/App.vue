@@ -4,6 +4,7 @@ import ArgumentGraph from "./components/ArgumentGraph.vue";
 import ArgumentInspector from "./components/ArgumentInspector.vue";
 import SnapshotEvents from "./components/SnapshotEvents.vue";
 import TheoryEditor from "./components/TheoryEditor.vue";
+import VerificationReports from "./components/VerificationReports.vue";
 import type { SnapshotEvent } from "./components/SnapshotEvents.vue";
 import type { AspicView } from "./domain/aspic";
 import { buildGraph, parseAspicView, MAX_FILE_BYTES } from "./domain/aspic";
@@ -293,6 +294,8 @@ function downloadSample() {
           evaluation to EAL; imported files are checked locally in the browser.
         </p>
       </section>
+
+      <VerificationReports :reports="view.verification_reports ?? []" />
 
       <div class="workspace">
         <aside class="index-panel" aria-label="Graph navigation">

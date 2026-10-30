@@ -59,4 +59,43 @@ graph acceptance from method completion. `structured/1` is identified as
 authored support without a formal proof. No solver or collector enters the
 browser, and old snapshots omit the optional field without new inferred facts.
 
+Optional `verification_reports` retains each native `grounded/1` report with
+its EAL source argument name. Reports are collected from the source map before
+graph projection, so a failed or unresolved route remains inspectable even
+when no formal argument was constructed. The shared `eal.verification-report/1`
+contract distinguishes mathematical, empirical and defeasible targets,
+obligation outcomes, source-to-symbol bindings and formula evaluations.
+Each wrapper retains the native execution status and reasons. Skipped or
+incomplete execution can carry a null report; the viewer displays that absence
+without inventing obligation results.
+Older snapshots without reports display “Verification not supplied”; the
+empty-state notice adds no synthetic verification data or inferred pass.
+The wrapper source distinguishes `native_method` reports from
+`engarg_assurance` reports attached by EngArg after replaying the matching
+execution. Both remain supplied records at this import boundary. A completed
+verifier execution can report a failed or unresolved obligation; its execution
+status does not replace the report outcome.
+Exact quantities use `eal.exact-number/1` string components and are displayed
+without conversion to JavaScript numbers. Verification reports containing
+unsafe integer JSON numbers are rejected instead of displaying rounded source
+values. This check is scoped to the new verification report boundary.
+The inspector shows the recorded runtime results separately from authored
+status and graph acceptance; `unknown` never becomes a displayed pass.
+
+The alternative of placing reports only on graph nodes would lose the most
+useful failure records. A second browser verifier would duplicate EAL's
+formula, source and applicability semantics. The chosen extension adds a
+bounded optional report list to `aspic-view/3`, preserving old snapshots and
+the supplied-provenance boundary. `VerificationReports.vue` owns presentation,
+`verification.ts` names the imported report fields, and the shared JSON budget
+walker bounds both report details and existing computation details. The browser
+does not authenticate observations, reconstruct a contract from prose or
+re-evaluate reported predicates.
+
+The EAL producer and viewer retain byte-identical view schemas. Unit tests
+check the closed report shape, missing source bindings, exact rational strings,
+resource limits and preservation of graph status. Browser tests cover
+unconstructed routes, unknown and failed applicability, mathematical scope,
+inert source text and a narrow viewport.
+
 Captured execution limits constrain imported graph counts alongside browser policy. Preferred-family completeness and exporter provenance remain supplied assertions; the browser contains no extension enumerator or argument constructor. The optional local bridge delegates these calculations to the reviewed native EAL implementation of `argumentation/aspic/2`. The executable is an operator trust choice; validating its returned graph does not authenticate its identity or supplied provenance.

@@ -1,0 +1,77 @@
+language "EAL/4"
+environment lab {
+ require site == "bench"
+}
+tool fixture_reader {
+ version "1"
+}
+reasoning verify_grounding {
+ method "grounded/1"
+ rationale "Check the declared synthetic source predicates, symbol coverage and applicability facets."
+}
+evidence checked_input {
+ tool fixture_reader
+ kind verification_case
+ environment lab
+ max_age 60
+ require schema == "EAL/typed-input/1"
+}
+claim checked_claim {
+ statement "The declared synthetic low-voltage premise has checked grounding and applicability (checked)."
+ environment lab
+ proposition {
+  subject "synthetic grounding fixture"
+  quantity "proposition"
+  unit "1"
+  scope "synthetic bench record"
+  valid_from "2026-10-24T11:00:00Z"
+  valid_until "2026-10-24T13:00:00Z"
+  query {"coverage":{"target_id":"checked_claim","mode":"empirical","formulas":[{"id":"low_voltage_premise","formula":"low_voltage"}],"required_obligations":[{"id":"calibration","role":"warrant"}]},"contract":{"schema":"eal.verification-contract/1","target_id":"checked_claim","mode":"empirical","atoms":[{"symbol":"low_voltage","observation_id":"reading_S","predicate":{"path":"voltage","operator":"<","expected":10}}],"obligations":[{"id":"calibration","role":"warrant","observation_id":"reading_S","predicate":{"path":"calibrated","operator":"==","expected":true}}],"applicability":[{"observation_id":"reading_S","identity_pointer":"/device","identity":"supply-S","unit_pointer":"/unit","unit":"V","scope_pointer":"/scope","scope":{"config":"bench-C"},"valid_from_pointer":"/valid_from","valid_until_pointer":"/valid_until","valid_from":"2026-10-24T11:00:00Z","valid_until":"2026-10-24T13:00:00Z","max_age_seconds":60}]}}
+  result verified == true
+ }
+}
+argument checked_route = [evidence checked_input] via verify_grounding => checked_claim binding checked_input
+evidence wrong_unit_input {
+ tool fixture_reader
+ kind verification_case
+ environment lab
+ max_age 60
+ require schema == "EAL/typed-input/1"
+}
+claim wrong_unit_claim {
+ statement "The declared synthetic low-voltage premise has checked grounding and applicability (wrong_unit)."
+ environment lab
+ proposition {
+  subject "synthetic grounding fixture"
+  quantity "proposition"
+  unit "1"
+  scope "synthetic bench record"
+  valid_from "2026-10-24T11:00:00Z"
+  valid_until "2026-10-24T13:00:00Z"
+  query {"coverage":{"target_id":"wrong_unit_claim","mode":"empirical","formulas":[{"id":"low_voltage_premise","formula":"low_voltage"}],"required_obligations":[{"id":"calibration","role":"warrant"}]},"contract":{"schema":"eal.verification-contract/1","target_id":"wrong_unit_claim","mode":"empirical","atoms":[{"symbol":"low_voltage","observation_id":"reading_S","predicate":{"path":"voltage","operator":"<","expected":10}}],"obligations":[{"id":"calibration","role":"warrant","observation_id":"reading_S","predicate":{"path":"calibrated","operator":"==","expected":true}}],"applicability":[{"observation_id":"reading_S","identity_pointer":"/device","identity":"supply-S","unit_pointer":"/unit","unit":"V","scope_pointer":"/scope","scope":{"config":"bench-C"},"valid_from_pointer":"/valid_from","valid_until_pointer":"/valid_until","valid_from":"2026-10-24T11:00:00Z","valid_until":"2026-10-24T13:00:00Z","max_age_seconds":60}]}}
+  result verified == true
+ }
+}
+argument wrong_unit_route = [evidence wrong_unit_input] via verify_grounding => wrong_unit_claim binding wrong_unit_input
+evidence undefined_symbol_input {
+ tool fixture_reader
+ kind verification_case
+ environment lab
+ max_age 60
+ require schema == "EAL/typed-input/1"
+}
+claim undefined_symbol_claim {
+ statement "The declared synthetic low-voltage premise has checked grounding and applicability (undefined_symbol)."
+ environment lab
+ proposition {
+  subject "synthetic grounding fixture"
+  quantity "proposition"
+  unit "1"
+  scope "synthetic bench record"
+  valid_from "2026-10-24T11:00:00Z"
+  valid_until "2026-10-24T13:00:00Z"
+  query {"coverage":{"target_id":"undefined_symbol_claim","mode":"empirical","formulas":[{"id":"low_voltage_premise","formula":"low_voltage"}],"required_obligations":[{"id":"calibration","role":"warrant"}]},"contract":{"schema":"eal.verification-contract/1","target_id":"undefined_symbol_claim","mode":"empirical","atoms":[],"obligations":[{"id":"calibration","role":"warrant","observation_id":"reading_S","predicate":{"path":"calibrated","operator":"==","expected":true}}],"applicability":[{"observation_id":"reading_S","identity_pointer":"/device","identity":"supply-S","unit_pointer":"/unit","unit":"V","scope_pointer":"/scope","scope":{"config":"bench-C"},"valid_from_pointer":"/valid_from","valid_until_pointer":"/valid_until","valid_from":"2026-10-24T11:00:00Z","valid_until":"2026-10-24T13:00:00Z","max_age_seconds":60}]}}
+  result verified == true
+ }
+}
+argument undefined_symbol_route = [evidence undefined_symbol_input] via verify_grounding => undefined_symbol_claim binding undefined_symbol_input
