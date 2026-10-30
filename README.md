@@ -70,12 +70,23 @@ Import `view.json` in this app. Explicit formal theories can use the same EAL ex
 - Dashed defeat edges connect attacker to defeated argument. The inspector identifies the exact attacked subargument and whether the defeat undermines, rebuts or undercuts.
 - `in`, `out` and `undecided` initially show grounded graph labels. **Graph labelling** can inspect each supplied extension. Selected query acceptance is displayed separately; labels are graph-relative, not truth values. A strict inference may still depend on fallible premises.
 - Source text, rationale, declaration location, observation metadata and review references remain inspectable. Unavailable evidence has typed causes such as `missing_observation`, `stale_observation` and `predicate_not_met`; an observed failed condition remains distinct from an absent observation. These entries never become negative premises.
+- When supplied by EAL, the inspector shows the native method identifier, result status, reasons and method-specific details separately from authored rationale. `structured/1` retains authored support without supplying a formal proof. A method result has separate premise-truth, prose-correspondence and applicability obligations; the browser does not rerun or authenticate the imported computation.
 - Search and the argument list provide keyboard access to graph selection. Relation filters and neighbourhood focus make hidden graph content explicit.
 - Import successive snapshots to record session events and compare added, removed and relabelled derivations. Restoring an event restores its graph. Import order is not evidence chronology or a solver execution trace; differing source or assessment identities remain visible.
 
 EAL/4 source supports scoped metadata and typed pattern instances. For example, an argument using `[premises measured] via rule => reportable` depends on a claim that another argument or `apply` instance establishes. The exporter constructs these nested derivations, and this app displays their immediate links and shared evidence. Modules, source imports, local block arguments, compound patterns, decreasing typed-list recursion, pure expressions and explicit conditional scope transfer are compiled by EAL. Reviewed `strict`, `rank`, `contrary` and `prefer` directives retain their formal-compilation meaning; ordinary EAL claim assessment is a separate contract.
 
 The import contract is `aspic-view/3`, matching the native producer schema exactly. Regenerate older exports that lack required captured budgets or use older schema versions before importing them.
+
+The optional `origin.computation` record is additive: older `aspic-view/3`
+snapshots remain valid without implying that a method result was supplied.
+Its closed outer shape retains `method`, native `status`, `reasons` and open
+method-specific `details`. Details remain inert JSON and obey the captured JSON
+depth/node budgets plus independent browser ceilings of 64 levels and 100,000
+nodes across imported computation details. Exact quantities should use the
+method's explicit string representation when they exceed JavaScript number
+precision. Computations for routes omitted from the constructed graph remain
+available in EAL's source map and assessment, rather than becoming graph nodes.
 
 ## Trust boundary
 

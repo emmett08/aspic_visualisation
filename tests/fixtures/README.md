@@ -21,6 +21,29 @@ pass that output through `parseAspicView`, including Ajv, captured budgets and
 graph checks. Browser tests import the same file and inspect its evidence
 groups. No evidence collection or external service is involved.
 
+# Exact finite-model computation fixture
+
+`finite-probability/view.json` is a native export of the committed
+`finite-probability/case.eal`. It defines the three-variable probability model
+and verifies its conditional probability with exact rational enumeration.
+The result is `152/201`, with normalizer `201/10000`. Its two constructed nodes
+are the checked mathematical route and an explicitly identified structural
+carrier; there are no acquired observations or claims about physical hardware
+or execution of pgmpy.
+
+The fixture was generated with `emmett08/eal-mcp` revision
+`ead1b9997b9c4f13d7d5409d87dff55afd9368b8`. Regenerate it with an installed
+native binary from that revision:
+
+```sh
+EAL_CORE_EXECUTABLE=/absolute/path/to/eal-core node tests/fixtures/finite-probability/regenerate.mjs
+```
+
+The generator uses a fixed assessment time, empty records and context, native
+`compile-aspic` and checked `export-aspic`. Unit and browser tests import its
+unmodified output and inspect the exact quantities. The original records and
+method calculations remain supplied provenance at the browser boundary.
+
 # Historical ASPIC+ keyword fixtures
 
 The three `aspic-keywords-*.json` fixtures come from the companion EAL
