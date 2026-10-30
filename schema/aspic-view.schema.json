@@ -751,6 +751,44 @@
                   "review"
                 ],
                 "additionalProperties": false
+              },
+              "computation": {
+                "type": "object",
+                "description": "Supplied native method result for this source argument. Graph acceptance, premise truth and prose correspondence remain separate.",
+                "properties": {
+                  "method": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100000
+                  },
+                  "status": {
+                    "enum": [
+                      "supported",
+                      "unsupported",
+                      "not_run",
+                      "incomplete"
+                    ]
+                  },
+                  "reasons": {
+                    "type": "array",
+                    "maxItems": 100000,
+                    "items": {
+                      "type": "string",
+                      "maxLength": 100000
+                    }
+                  },
+                  "details": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "method",
+                  "status",
+                  "reasons",
+                  "details"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [

@@ -49,4 +49,14 @@ The canonical snapshot preserves grounded labels and selected query metadata. Ch
 
 Availability groups use typed causes, never reason-text inference. Missing observations, failed predicates, stale observations, collection errors, invalid observations and scope mismatches remain distinct. One record may occur in multiple groups when it carries multiple supplied issues; grouping adds no premise. Source-file and conditional transfer metadata are displayed as supplied records.
 
+Optional `origin.computation` carries a native method result through the same
+supplied provenance boundary. The closed outer schema distinguishes its method,
+native result status, reasons and method-specific JSON details. The computation
+domain module bounds open details before rendering; a dedicated inspector
+component displays them as text, separately from authored rationale and
+observation identity. It does not infer premise truth, prose correspondence or
+graph acceptance from method completion. `structured/1` is identified as
+authored support without a formal proof. No solver or collector enters the
+browser, and old snapshots omit the optional field without new inferred facts.
+
 Captured execution limits constrain imported graph counts alongside browser policy. Preferred-family completeness and exporter provenance remain supplied assertions; the browser contains no extension enumerator or argument constructor. The optional local bridge delegates these calculations to the reviewed native EAL implementation of `argumentation/aspic/2`. The executable is an operator trust choice; validating its returned graph does not authenticate its identity or supplied provenance.

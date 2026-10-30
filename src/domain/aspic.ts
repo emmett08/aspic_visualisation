@@ -1,5 +1,7 @@
 import Ajv2020 from 'ajv/dist/2020.js'
 import schema from '../../schema/aspic-view.schema.json'
+import { computationDetailsIssue } from './computation'
+import type { ComputationResult } from './computation'
 
 /** Read-only browser boundary for the versioned EAL ASPIC+ export.
  * Validation checks the supplied graph. It cannot authenticate provenance or prove
@@ -47,6 +49,7 @@ export interface ArgumentOrigin {
   name: string; span?: SourceSpan | null; formal_review?: ArgumentationDirective | null;
   observation?: Observation | null; rationale?: string; reasoning?: string; meaning?: string; source_file?: string;
   scope_transfer?: { source: string; target: string; assumption: string; review: string }
+  computation?: ComputationResult
 }
 export interface AspicArgument {
   id: string; conclusion: string; top: 'axiom' | 'ordinary' | 'strict' | 'defeasible';
@@ -205,6 +208,11 @@ export function validateAspicView(value: unknown): AspicView {
     fail(issue?.instancePath || 'view', `${issue?.message ?? 'invalid export'}${issue?.params ? ` (${JSON.stringify(issue.params)})` : ''}`)
   }
   const view = value as AspicView
+  const detailsIssue = computationDetailsIssue(
+    view.arguments.flatMap(argument => argument.origin.computation ? [argument.origin.computation] : []),
+    { json_depth: view.execution_limits.json_depth!, json_nodes: view.execution_limits.json_nodes! },
+  )
+  if (detailsIssue) fail('computation', detailsIssue)
   if (view.arguments.length > MAX_ARGUMENTS) fail('arguments', `exceeds the browser policy of ${MAX_ARGUMENTS}`)
   if (view.defeats.length > MAX_DEFEATS) fail('defeats', `exceeds the browser policy of ${MAX_DEFEATS}`)
   if (view.arguments.length > view.execution_limits.formal_arguments! || view.defeats.length > view.execution_limits.formal_defeats!) fail('execution_limits', 'graph exceeds supplied budgets')

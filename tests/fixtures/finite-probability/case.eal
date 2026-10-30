@@ -1,0 +1,23 @@
+language "EAL/4"
+environment mathematical {
+ require true
+}
+reasoning exact {
+ method "finite_probability/1"
+ rationale "Enumerate the exact finite distribution defined in this query. This establishes a model consequence; the probabilities are stipulations and no physical power supply or pgmpy execution is asserted."
+}
+claim consequence {
+ statement "In this stipulated finite model with both indications true, the conditional probability of the faulty state is at least three quarters."
+ environment mathematical
+ proposition {
+  subject "stipulated finite diagnostic model"
+  quantity "probability"
+  unit "1"
+  scope "the exact nodes, CPDs, state labels and selected evidence in this query only"
+  valid_from "2026-01-01T00:00:00Z"
+  valid_until "2027-01-01T00:00:00Z"
+  query {"nodes":[{"name":"Fault","states":["healthy","faulty"],"parents":[],"probabilities":["49/50","1/50"]},{"name":"Alarm","states":["false","true"],"parents":["Fault"],"probabilities":["19/20","1/20","1/20","19/20"]},{"name":"HeartbeatLost","states":["false","true"],"parents":["Fault"],"probabilities":["9/10","1/10","1/5","4/5"]}],"evidence":{"Alarm":"true","HeartbeatLost":"true"},"target":{"variable":"Fault","state":"faulty"},"comparison":{"operator":">=","threshold":"3/4"}}
+  result satisfies == true
+ }
+}
+argument proof = [] via exact => consequence

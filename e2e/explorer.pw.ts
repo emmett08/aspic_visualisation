@@ -5,6 +5,7 @@ const sample: AspicView = JSON.parse(readFileSync(new URL('../src/domain/sample.
 const keywordCompiled: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-compiled.json', import.meta.url), 'utf8'))
 const keywordFormal: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/aspic-keywords-formal.json', import.meta.url), 'utf8'))
 const nativeEal4: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/eal4-native/view.json', import.meta.url), 'utf8'))
+const finiteProbability: AspicView = JSON.parse(readFileSync(new URL('../tests/fixtures/finite-probability/view.json', import.meta.url), 'utf8'))
 
 test('static build can populate theory fields while evaluation stays disabled', async ({ page }) => {
   await page.goto('/')
@@ -21,6 +22,48 @@ async function importView(page: import('@playwright/test').Page, view: unknown, 
     name, mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(view)),
   })
 }
+
+test('recorded computations stay distinct from authored reasoning and premise evidence', async ({ page }) => {
+  await page.goto('/')
+  const view = structuredClone(sample)
+  const index = view.arguments.findIndex(argument => argument.origin.kind === 'argument')
+  const hostile = '<img src=x onerror="window.injected=true">'
+  view.arguments[index]!.origin.computation = {
+    method: 'finite_probability/1', status: 'supported',
+    reasons: ['The stipulated model was enumerated.'],
+    details: { posterior: { numerator: '152', denominator: '201' }, note: hostile },
+  }
+  await importView(page, view, 'recorded-computation.json')
+  await page.locator('.argument-row').nth(index).click()
+  const computation = page.getByLabel('Recorded computation', { exact: true })
+  await expect(computation).toContainText('finite_probability/1')
+  await expect(computation).toContainText('Supported')
+  await expect(computation).toContainText('Premise truth, prose correspondence and applicability have separate evidence obligations.')
+  await computation.getByText('Method-specific result details', { exact: true }).click()
+  await expect(computation.locator('pre')).toContainText('152')
+  await expect(computation.locator('pre')).toContainText(JSON.stringify(hostile))
+  await expect(computation.locator('img')).toHaveCount(0)
+  expect(await page.evaluate(() => Object.hasOwn(window, 'injected'))).toBe(false)
+  view.arguments[index]!.origin.computation = { method: 'structured/1', status: 'supported', reasons: [], details: {} }
+  await importView(page, view, 'authored-computation.json')
+  await page.locator('.argument-row').nth(index).click()
+  await expect(page.getByLabel('Recorded computation', { exact: true })).toContainText('It supplies no formal proof.')
+  await expect(page.locator('.provenance-note')).toContainText('not authenticated')
+})
+
+test('native finite-model proof displays exact quantities and a structural carrier without observations', async ({ page }) => {
+  await page.goto('/')
+  await importView(page, finiteProbability, 'finite-model-proof.json')
+  const proof = finiteProbability.arguments.findIndex(argument => argument.origin.name === 'proof')
+  await page.locator('.argument-row').nth(proof).click()
+  await expect(page.getByLabel('Recorded computation', { exact: true })).toContainText('finite_probability/1')
+  await expect(page.getByLabel('Exact computation quantities')).toContainText('152/201')
+  await expect(page.getByLabel('Exact computation quantities')).toContainText('201/10000')
+  await expect(page.getByRole('heading', { name: 'Observation identity', exact: true })).toHaveCount(0)
+  const carrier = finiteProbability.arguments.findIndex(argument => argument.origin.kind === 'structural basis')
+  await page.locator('.argument-row').nth(carrier).click()
+  await expect(page.locator('.details-panel')).toContainText('no observation')
+})
 
 test('one graph supports keyboard selection, exact defeat witnesses and visible filters', async ({ page }) => {
   const errors: string[] = []

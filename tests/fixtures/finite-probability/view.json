@@ -1,0 +1,195 @@
+{
+  "schema": "aspic-view/3",
+  "theory_digest": "7a3e357bb502d8b95851a20a6d4bddf280072a4e31dfd7199d5a57a6399bcc09",
+  "evaluated_at": "2026-10-30T12:00:00Z",
+  "validation": {
+    "formal_result": "recomputed",
+    "provenance": "supplied"
+  },
+  "profile": "EAL/4-compiled-aspic/5",
+  "goal": "c84bb160039a7955385c4",
+  "goal_claim": "consequence",
+  "formal_status": "accepted",
+  "execution_limits": {
+    "source_bytes": 1048576,
+    "source_tokens": 100000,
+    "structural_values": 100000,
+    "declarations": 4096,
+    "premise_depth": 128,
+    "expansion_depth": 128,
+    "applications": 1000,
+    "expanded_references": 100000,
+    "expression_nodes": 10000,
+    "expression_depth": 128,
+    "json_depth": 64,
+    "json_nodes": 100000,
+    "record_bytes": 4194304,
+    "collection_evidence": 128,
+    "method_work": 1000000000,
+    "composed_edges": 131072,
+    "abstract_attacks": 65536,
+    "formal_premises": 64,
+    "formal_rules": 64,
+    "formal_antecedents": 8,
+    "formal_atoms": 128,
+    "formal_contraries": 128,
+    "formal_arguments": 128,
+    "formal_defeats": 4096,
+    "formal_construction": 100000,
+    "extension_search": 100000
+  },
+  "formal_directives": [],
+  "claim_status": "supported",
+  "authored_claim_status": "supported",
+  "source_digest": "2cb1f353436c1ecf24c0af7597bb079c9472d4bc74bd05af2a882be11bd068ff",
+  "snapshot_digest": "91647095e9b0a95fe4eb8a2d3bb05424da0da7bbb0afc539b5c239b1914eb9fa",
+  "arguments": [
+    {
+      "id": "A0",
+      "conclusion": "bfa5ffc4636602bd24d21",
+      "top": "axiom",
+      "subarguments": [],
+      "strength": 1001,
+      "direct_subarguments": [],
+      "label": "in",
+      "display_conclusion": "bfa5ffc4636602bd24d21",
+      "origin": {
+        "kind": "structural basis",
+        "name": "compiler_basis",
+        "meaning": "Structural carrier for a zero-antecedent rule or empty snapshot; no observation"
+      }
+    },
+    {
+      "id": "A1",
+      "conclusion": "c84bb160039a7955385c4",
+      "top": "defeasible",
+      "subarguments": [
+        "A0"
+      ],
+      "strength": 500,
+      "direct_subarguments": [
+        "A0"
+      ],
+      "label": "in",
+      "rule_id": "rc1cda26362828b692665",
+      "rule_name": "x8aef9d5b87fc8e3ccdee",
+      "rank": 500,
+      "display_conclusion": "consequence",
+      "origin": {
+        "kind": "argument",
+        "name": "proof",
+        "span": {
+          "line": 23,
+          "column": 1,
+          "end_line": 24,
+          "end_column": 1
+        },
+        "formal_review": null,
+        "rationale": "Enumerate the exact finite distribution defined in this query. This establishes a model consequence; the probabilities are stipulations and no physical power supply or pgmpy execution is asserted.",
+        "reasoning": "exact",
+        "source_file": "case.eal",
+        "computation": {
+          "method": "finite_probability/1",
+          "status": "supported",
+          "reasons": [
+            "Method finite_probability/1: Complete exact finite-model conditioning; model correspondence and empirical adequacy remain separate obligations"
+          ],
+          "details": {
+            "defined": true,
+            "satisfies": true,
+            "normalizer": 0.0201,
+            "normalizer_exact": {
+              "schema": "eal.exact-number/1",
+              "numerator": "201",
+              "denominator": "10000",
+              "unit": "1"
+            },
+            "numerator_exact": {
+              "schema": "eal.exact-number/1",
+              "numerator": "19",
+              "denominator": "1250",
+              "unit": "1"
+            },
+            "assignments": 8,
+            "matching_assignments": 2,
+            "comparison": {
+              "operator": ">=",
+              "threshold_exact": {
+                "schema": "eal.exact-number/1",
+                "numerator": "3",
+                "denominator": "4",
+                "unit": "1"
+              }
+            },
+            "mapping": {
+              "node_order": [
+                "Fault",
+                "Alarm",
+                "HeartbeatLost"
+              ],
+              "nodes": [
+                {
+                  "name": "Fault",
+                  "states": [
+                    "healthy",
+                    "faulty"
+                  ],
+                  "parents": []
+                },
+                {
+                  "name": "Alarm",
+                  "states": [
+                    "false",
+                    "true"
+                  ],
+                  "parents": [
+                    "Fault"
+                  ]
+                },
+                {
+                  "name": "HeartbeatLost",
+                  "states": [
+                    "false",
+                    "true"
+                  ],
+                  "parents": [
+                    "Fault"
+                  ]
+                }
+              ],
+              "cpd_layout": "parents in declared order; last parent varies fastest; child state varies fastest within each parent configuration",
+              "evidence": {
+                "Alarm": "true",
+                "HeartbeatLost": "true"
+              },
+              "target": {
+                "variable": "Fault",
+                "state": "faulty"
+              }
+            },
+            "posterior": 0.7562189054726368,
+            "posterior_exact": {
+              "schema": "eal.exact-number/1",
+              "numerator": "152",
+              "denominator": "201",
+              "unit": "1"
+            }
+          }
+        }
+      },
+      "authored_statement": "In this stipulated finite model with both indications true, the conditional probability of the faulty state is at least three quarters."
+    }
+  ],
+  "defeats": [],
+  "unavailable_evidence": [],
+  "semantics": "grounded",
+  "query_mode": "sceptical",
+  "query_status": "accepted",
+  "preference": "minimum_rank",
+  "extensions": [
+    [
+      "A0",
+      "A1"
+    ]
+  ]
+}

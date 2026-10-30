@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import type { AspicView, AspicGraph } from "../domain/aspic";
 import { availabilityIssueText, availabilityIssueTitle, evidenceGroups } from "../domain/aspic";
+import ComputationDetails from './ComputationDetails.vue';
 
 const props = defineProps<{
   view: AspicView;
@@ -146,6 +147,7 @@ function selectEdge(id: string) {
           <pre>{{ pretty(argument.origin.scope_transfer) }}</pre>
           <p class="small-note">Proposition correspondence is checked by EAL. The transfer justification is an authored assumption.</p>
         </section>
+        <ComputationDetails v-if="argument.origin.computation" :computation="argument.origin.computation" />
         <section v-if="field(argument.origin, 'span')" class="detail-section">
           <h4>Source location</h4>
           <p v-if="argument.origin.source_file">{{ argument.origin.source_file }}</p>
